@@ -12,10 +12,10 @@
 //! WebRTC's Windows device module names each device by its endpoint id, as
 //! `IMMDevice::GetId` gives it, so a device id opens the endpoint directly.
 
-use std::{
-    cell::RefCell,
-    time::{Duration, Instant},
-};
+use std::time::{Duration, Instant};
+
+#[cfg(feature = "discord")]
+use std::cell::RefCell;
 
 use anyhow::{Context as _, Result, anyhow, ensure};
 use windows::{
@@ -42,21 +42,26 @@ use windows::{
             Com::{
                 CLSCTX_ALL, COINIT_MULTITHREADED, CoCreateInstance, CoInitializeEx, CoUninitialize,
             },
-            Threading::{
-                AvRevertMmThreadCharacteristics, AvSetMmThreadCharacteristicsW, CreateEventW,
-                WaitForSingleObject,
-            },
+            Threading::{CreateEventW, WaitForSingleObject},
         },
     },
-    core::{HSTRING, w},
+    core::HSTRING,
+};
+
+#[cfg(feature = "discord")]
+use windows::{
+    Win32::System::Threading::{AvRevertMmThreadCharacteristics, AvSetMmThreadCharacteristicsW},
+    core::w,
 };
 
 use super::Format;
 use crate::voice::NAMED;
 
 /// A thread's place in an MMCSS task, given back as it ends.
+#[cfg(feature = "discord")]
 struct Mmcss(HANDLE);
 
+#[cfg(feature = "discord")]
 impl Drop for Mmcss {
     fn drop(&mut self) {
         // SAFETY: the handle AvSetMmThreadCharacteristicsW gave this thread.
@@ -64,6 +69,7 @@ impl Drop for Mmcss {
     }
 }
 
+#[cfg(feature = "discord")]
 thread_local! {
     static MMCSS: RefCell<Option<Mmcss>> = const { RefCell::new(None) };
 }
@@ -72,6 +78,7 @@ thread_local! {
 /// Discord's and browsers' do; a microphone's joins "Audio", the category
 /// below, which is still above every ordinary thread. Says how it raised
 /// the calling thread, or why it couldn't.
+#[cfg(feature = "discord")]
 pub fn raise_priority(priority: super::Priority) -> Result<&'static str, String> {
     let (name, how) = match priority {
         super::Priority::Playback => (w!("Pro Audio"), "MMCSS Pro Audio"),
@@ -461,6 +468,7 @@ impl Output {
         Ok(())
     }
 
+    #[cfg(feature = "discord")]
     pub fn flush(&mut self) {
         com();
         self.stream.stop();
@@ -468,6 +476,7 @@ impl Output {
         let _ = unsafe { self.stream.client.Reset() };
     }
 
+    #[cfg(feature = "discord")]
     pub fn latency(&self) -> Duration {
         com();
         let queued = self.stream.padding().unwrap_or(0);

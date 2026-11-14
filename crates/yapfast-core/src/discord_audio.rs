@@ -889,7 +889,9 @@ fn processes_a_recording() {
     let read = |name| -> Vec<i16> {
         std::fs::read(std::env::var(name).unwrap())
             .unwrap()
-            .chunks_exact(2)
+            .as_chunks::<2>()
+            .0
+            .iter()
             .map(|pair| i16::from_le_bytes([pair[0], pair[1]]))
             .collect()
     };
@@ -907,9 +909,11 @@ fn processes_a_recording() {
     let (mut processed, mut sent) = (Vec::new(), Vec::new());
     let (mut opened, mut blocks) = (0, 0);
     let mut took = std::time::Duration::ZERO;
-    for bytes in input.chunks_exact(BLOCK * 2) {
+    for bytes in input.as_chunks::<{ BLOCK * 2 }>().0.iter() {
         let mut block: Vec<i16> = bytes
-            .chunks_exact(2)
+            .as_chunks::<2>()
+            .0
+            .iter()
             .map(|pair| i16::from_le_bytes([pair[0], pair[1]]))
             .collect();
         if let Some(far) = &far

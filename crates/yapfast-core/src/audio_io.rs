@@ -9,12 +9,11 @@
 //! Linux goes through PulseAudio, or PipeWire's PulseAudio server, and
 //! Windows through WASAPI. Other systems have no sound here yet.
 
+#[cfg(any(feature = "discord", target_os = "windows"))]
+use std::sync::atomic::AtomicBool;
 use std::{marker::PhantomData, time::Duration};
 #[cfg(feature = "discord")]
-use std::{
-    sync::{Arc, atomic::AtomicBool},
-    thread::JoinHandle,
-};
+use std::{sync::Arc, thread::JoinHandle};
 
 use anyhow::Result;
 
@@ -47,6 +46,7 @@ pub use lasting::{LastingInput, LastingOutput};
 ///
 /// `thread` names it for the log, which says at info level whether it was
 /// raised, and for [`NO_PRIORITY`], which leaves it at normal priority.
+#[cfg(feature = "discord")]
 pub fn raise_thread_priority(thread: &str) {
     raise(thread, Priority::Playback);
 }
@@ -61,6 +61,7 @@ pub fn raise_capture_priority() {
     raise("microphone", Priority::Capture);
 }
 
+#[cfg(feature = "discord")]
 fn raise(thread: &str, priority: Priority) {
     if priority_off(std::env::var(NO_PRIORITY).ok().as_deref(), thread) {
         tracing::info!(
@@ -77,7 +78,7 @@ fn raise(thread: &str, priority: Priority) {
 
 /// Which audio threads a thread joins in priority.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[cfg_attr(not(feature = "discord"), allow(dead_code))]
+#[cfg(feature = "discord")]
 enum Priority {
     /// Threads that play: a call's and the speakers'.
     Playback,
@@ -88,9 +89,11 @@ enum Priority {
 /// Leaves audio threads at normal priority, to tell whether raising them is
 /// what goes wrong on a machine: `1` or `all` for every one, or a list of
 /// them, such as `call,speakers,microphone`.
+#[cfg(feature = "discord")]
 pub const NO_PRIORITY: &str = "YAPFAST_VOICE_NO_PRIORITY";
 
 /// Whether [`NO_PRIORITY`]'s value leaves `thread` at normal priority.
+#[cfg(feature = "discord")]
 fn priority_off(value: Option<&str>, thread: &str) -> bool {
     match value.map(str::trim) {
         None | Some("" | "0") => false,
@@ -270,13 +273,13 @@ impl<S: Sample> Output<S> {
     }
 
     /// Drops everything queued and not yet played.
-    #[cfg_attr(not(feature = "discord"), allow(dead_code))]
+    #[cfg(feature = "discord")]
     pub fn flush(&mut self) {
         self.stream.flush();
     }
 
     /// How long until what's written now is heard.
-    #[cfg_attr(not(feature = "discord"), allow(dead_code))]
+    #[cfg(feature = "discord")]
     pub fn latency(&self) -> Duration {
         self.stream.latency()
     }
@@ -352,6 +355,7 @@ type Hear = Box<dyn FnMut(Heard<'_>) + Send>;
 mod tests {
     use super::*;
 
+    #[cfg(feature = "discord")]
     #[test]
     fn the_priority_switch_names_threads() {
         for unset in [None, Some(""), Some("0")] {
@@ -477,7 +481,7 @@ mod tests {
                 .unwrap();
         let mut frame = [0f32; RATE as usize / 50 * 2];
         for start in (0..RATE as usize).step_by(frame.len() / 2) {
-            for (at, pair) in frame.chunks_exact_mut(2).enumerate() {
+            for (at, pair) in frame.as_chunks_mut::<2>().0.iter_mut().enumerate() {
                 pair.fill(tone(start + at));
             }
             output.write(&frame).unwrap();
@@ -536,7 +540,9 @@ mod tests {
         hearing.join().unwrap();
         let other = heard.lock().unwrap().clone();
         let crossings = other
-            .chunks_exact(2)
+            .as_chunks::<2>()
+            .0
+            .iter()
             .map(|pair| pair[0])
             .collect::<Vec<_>>()
             .windows(2)

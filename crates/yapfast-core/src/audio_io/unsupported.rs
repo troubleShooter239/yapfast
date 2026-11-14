@@ -8,6 +8,7 @@ use super::Format;
 
 const UNSUPPORTED: &str = "Yapfast has no sound on this system yet.";
 
+#[cfg(feature = "discord")]
 pub fn raise_priority(_: super::Priority) -> Result<&'static str, String> {
     Err(UNSUPPORTED.to_owned())
 }
@@ -30,8 +31,10 @@ impl Output {
         bail!(UNSUPPORTED)
     }
 
+    #[cfg(feature = "discord")]
     pub fn flush(&mut self) {}
 
+    #[cfg(feature = "discord")]
     pub fn latency(&self) -> Duration {
         Duration::ZERO
     }

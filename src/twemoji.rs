@@ -291,17 +291,17 @@ mod tests {
     /// The glyphs and advances the font shapes `text` into, as Slint's text
     /// shapes it.
     fn shaped(text: &str) -> Vec<(u32, i32)> {
-        let font = harfrust::FontRef::new(FONT).expect("the font reads");
-        let data = harfrust::ShaperData::new(&font);
-        let shaper = data.shaper(&font).build();
-        let mut buffer = harfrust::UnicodeBuffer::new();
+        let font = harfrust::Font::new(FONT, 0).expect("the font reads");
+        let shaper = harfrust::ShaperFont::new(&font);
+        let mut buffer = harfrust::Buffer::new();
         buffer.push_str(text);
         buffer.guess_segment_properties();
-        let shaped = shaper.shape(buffer, harfrust::ShapeOptions::new());
-        shaped
+        harfrust::shape(&shaper, &mut buffer, harfrust::ShapeOptions::new())
+            .expect("the emoji shapes");
+        buffer
             .glyph_infos()
             .iter()
-            .zip(shaped.glyph_positions())
+            .zip(buffer.glyph_positions())
             .map(|(info, position)| (info.glyph_id, position.x_advance))
             .collect()
     }

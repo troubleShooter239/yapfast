@@ -18,3 +18,15 @@ Changes, marked `Yapfast:` in the source:
   joined group is left as it is.
 - `read_leb128` stops at ten bytes rather than shifting past a `u64`, which
   panics in a debug build when a received frame's nonce runs that long.
+
+Dependency maintenance: the OpenMLS crates come from one upstream revision,
+`6100df3fb1d8c3eeab53e349fcbd621f98c44fe2`, including its updated P-256 and HPKE
+providers. No separate OpenMLS source copies are maintained under vendor/.
+The upstream manifest at this revision reports OpenMLS 0.9.0. process_commit
+merges a pending commit only for authenticated OwnPendingCommit results;
+mismatched own commits remain errors. The exported secret wrapper is converted
+to the bytes the existing media ratchet consumes, without logging the secret.
+Unused hex-literal is removed. napi and num-traits are kept for macro expansions.
+
+OpenMLS was already a dependency of the original davey 0.1.4, and remains one
+in the published upstream davey 0.2.0; it implements this Rust DAVE session's MLS.

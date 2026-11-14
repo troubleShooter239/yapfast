@@ -13,9 +13,7 @@
 //! open.
 
 use super::*;
-#[cfg(feature = "discord")]
-use crate::chat::Sticker;
-use crate::chat::{Permission, StickerCollection};
+use crate::chat::{Permission, Sticker, StickerCollection};
 
 /// A picture the picker shows, by its address.
 #[derive(Clone, Debug)]
@@ -158,7 +156,8 @@ impl StickerPicker {
             None => false,
         };
         let mut listed = vec![];
-        for (id, name, stickers) in [("favorites", "Favorites", self.favorites.iter())] {
+        {
+            let (id, name, stickers) = ("favorites", "Favorites", self.favorites.iter());
             if let Some(collection) = ListedCollection::of(id, name, stickers, &search, usable) {
                 listed.push(collection);
             }

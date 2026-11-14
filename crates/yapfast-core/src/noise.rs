@@ -421,7 +421,7 @@ mod tests {
             })
             .collect();
         let mut output = Vec::with_capacity(input.len());
-        for (index, noisy) in input.chunks_exact(BLOCK).enumerate() {
+        for (index, noisy) in input.as_chunks::<BLOCK>().0.iter().enumerate() {
             let mut block = noisy.to_vec();
             // Sent whatever it is, as push-to-talk's held key sends it: a
             // steady tone would otherwise make a pause.
@@ -452,8 +452,10 @@ mod tests {
     fn compares_suppressors() {
         let input: Vec<f32> = std::fs::read(std::env::var("YAPFAST_NOISE_IN").unwrap())
             .unwrap()
-            .chunks_exact(4)
-            .map(|bytes| f32::from_le_bytes(bytes.try_into().unwrap()) * 32768.0)
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .map(|bytes| f32::from_le_bytes(*bytes) * 32768.0)
             .collect();
         let out = std::env::var("YAPFAST_NOISE_OUT").unwrap();
         let resident = || {
@@ -493,7 +495,7 @@ mod tests {
             let suppressor = denoiser.suppressor();
             let (mut samples, mut rows) = (Vec::new(), String::from("us,snr,vad\n"));
             let mut times = Vec::new();
-            for noisy in input.chunks_exact(BLOCK) {
+            for noisy in input.as_chunks::<BLOCK>().0.iter() {
                 let mut block = noisy.to_vec();
                 let started = Instant::now();
                 denoiser.block(&mut block, Sent::Gated, false);

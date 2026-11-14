@@ -19,9 +19,11 @@ use crate::voice::NAMED;
 /// Real-time priority for Yapfast's audio threads: above every ordinary
 /// thread, and below PipeWire's own, which run at 88 or more. A
 /// microphone's thread runs a step below those that play.
+#[cfg(feature = "discord")]
 const REALTIME: i32 = 10;
 
 /// Says how it raised the calling thread, or why it couldn't.
+#[cfg(feature = "discord")]
 pub fn raise_priority(priority: super::Priority) -> Result<&'static str, String> {
     let (sched_priority, how) = match priority {
         super::Priority::Playback => (REALTIME, "SCHED_FIFO 10"),
@@ -83,10 +85,12 @@ impl Output {
         self.0.drain().map_err(|error| anyhow!("{error}"))
     }
 
+    #[cfg(feature = "discord")]
     pub fn flush(&mut self) {
         let _ = self.0.flush();
     }
 
+    #[cfg(feature = "discord")]
     pub fn latency(&self) -> Duration {
         self.0
             .get_latency()
@@ -559,11 +563,13 @@ mod others {
                                 ([], samples, []) => samples,
                                 _ => {
                                     unaligned.clear();
-                                    unaligned.extend(bytes.chunks_exact(4).map(|sample| {
-                                        f32::from_ne_bytes([
-                                            sample[0], sample[1], sample[2], sample[3],
-                                        ])
-                                    }));
+                                    unaligned.extend(bytes.as_chunks::<4>().0.iter().map(
+                                        |sample| {
+                                            f32::from_ne_bytes([
+                                                sample[0], sample[1], sample[2], sample[3],
+                                            ])
+                                        },
+                                    ));
                                     &unaligned
                                 }
                             };

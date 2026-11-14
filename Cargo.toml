@@ -2,7 +2,7 @@
 name = "yapfast"
 version = "0.3.0"
 edition = "2024"
-rust-version = "1.97"
+rust-version = "1.100"
 publish = false
 license = "GPL-3.0-or-later"
 
@@ -13,7 +13,17 @@ default-members = ["."]
 # every workspace member it compiles, even one --exclude leaves out, and
 # linting Slint's generated code took 190 s of a 253 s check after a UI change.
 # Outside, rustc checks it in 37 s.
-exclude = ["crates/yapfast-ui", "vendor/matrix-rtc-livekit", "vendor/webrtc-sys", "vendor/davey", "vendor/x264-src", "vendor/ffmpeg-src"]
+exclude = [
+    "crates/yapfast-ui",
+    "vendor/davey",
+    "vendor/ffmpeg-src",
+    "vendor/i-slint-core",
+    "vendor/i-slint-renderer-skia",
+    "vendor/matrix-rtc-livekit",
+    "vendor/tungstenite",
+    "vendor/webrtc-sys",
+    "vendor/x264-src",
+]
 resolver = "3"
 
 [features]
@@ -36,7 +46,7 @@ slint = { workspace = true, optional = true }
 # Reject an unpinned native source build if the prepared Skia archive is unavailable.
 skia-safe = { version = "=0.157.0", default-features = false, features = ["binary-cache", "no-compile"], optional = true }
 # Native open and save dialogs: XDG portals on Linux, common dialogs on Windows.
-rfd = { version = "0.17", default-features = false, features = ["xdg-portal"], optional = true }
+rfd = { version = "0.18", default-features = false, features = ["xdg-portal"], optional = true }
 # Names and categories for the emoji picker.
 emojis = { version = "0.9", optional = true }
 # Maps the color emoji font Yapfast registers with Slint, rather than copying it.
@@ -60,7 +70,7 @@ tracing.workspace = true
 reqwest = { version = "0.13", default-features = false, features = ["http2", "rustls-no-provider"], optional = true }
 rustls = { workspace = true, optional = true }
 # Checks a downloaded release against the SHA256SUMS.txt it was published with.
-sha2 = { version = "0.10", optional = true }
+sha2 = { version = "0.11", optional = true }
 # The code the Discord phone app scans to link an account.
 qrcode = { version = "0.14", default-features = false, optional = true }
 
@@ -127,7 +137,7 @@ yapfast-core = { path = "crates/yapfast-core", default-features = false, feature
 yapfast-discord = { path = "crates/yapfast-discord" }
 tempfile.workspace = true
 # Shapes text with Twemoji's font, as Slint's text does, for its ligatures' test.
-harfrust = "0.12"
+harfrust = "0.16"
 
 # Types keys for the push-to-talk hook's test.
 [target.'cfg(windows)'.dev-dependencies]
