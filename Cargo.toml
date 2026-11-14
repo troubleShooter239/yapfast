@@ -20,6 +20,7 @@ exclude = [
     "vendor/i-slint-core",
     "vendor/i-slint-renderer-skia",
     "vendor/matrix-rtc-livekit",
+    "vendor/matrix-rtc-call-sdk",
     "vendor/tungstenite",
     "vendor/webrtc-sys",
     "vendor/x264-src",
@@ -156,14 +157,15 @@ chrono = { version = "0.4.45", default-features = false, features = ["clock", "s
 directories = "6"
 futures-util = "0.3"
 keyring = "=4.2.0"
-livekit = { version = "=0.7.48", features = ["rustls-tls-native-roots", "rustls-tls-webpki-roots"] }
+livekit = { version = "=0.9.7", features = ["rustls-tls-native-roots", "rustls-tls-webpki-roots"] }
 # Keep this SDK source and revision identical to matrix-rust-rtc's workspace pin.
-matrix-sdk = { git = "https://github.com/matrix-org/matrix-rust-sdk", rev = "c6ad52ecc09eaa36601f55effb0a48a533eb87dd", features = ["bundled-sqlite", "markdown"] }
-matrix-sdk-ui = { git = "https://github.com/matrix-org/matrix-rust-sdk", rev = "c6ad52ecc09eaa36601f55effb0a48a533eb87dd", features = ["unstable-msc4354"] }
-matrix-sdk-crypto = { git = "https://github.com/matrix-org/matrix-rust-sdk", rev = "c6ad52ecc09eaa36601f55effb0a48a533eb87dd" }
-matrix-rtc-livekit = { path = "vendor/matrix-rtc-livekit", features = ["matrix-sdk"] }
-matrix-rtc-core = { git = "https://github.com/element-hq/matrix-rust-rtc", rev = "5831af899f1e1744c21332613cdc9578a98c604f" }
-matrix-rtc-media = { git = "https://github.com/element-hq/matrix-rust-rtc", rev = "5831af899f1e1744c21332613cdc9578a98c604f" }
+matrix-sdk = { git = "https://github.com/matrix-org/matrix-rust-sdk", rev = "56bc59112822e7eb25943a95e02502855cdeef2d", features = ["bundled-sqlite", "markdown"] }
+matrix-sdk-ui = { git = "https://github.com/matrix-org/matrix-rust-sdk", rev = "56bc59112822e7eb25943a95e02502855cdeef2d", features = ["unstable-msc4354"] }
+matrix-sdk-crypto = { git = "https://github.com/matrix-org/matrix-rust-sdk", rev = "56bc59112822e7eb25943a95e02502855cdeef2d" }
+matrix-rtc-call-sdk = { path = "vendor/matrix-rtc-call-sdk", features = ["matrix-sdk"] }
+matrix-rtc-call = { git = "https://github.com/element-hq/matrix-rust-rtc", rev = "52af3d1f4dc6af5c92ce5f8c64418fd97a8c4f57" }
+matrix-rtc-core = { git = "https://github.com/element-hq/matrix-rust-rtc", rev = "52af3d1f4dc6af5c92ce5f8c64418fd97a8c4f57" }
+matrix-rtc-transport = { git = "https://github.com/element-hq/matrix-rust-rtc", rev = "52af3d1f4dc6af5c92ce5f8c64418fd97a8c4f57" }
 rustls = { version = "0.23", features = ["aws_lc_rs"] }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"

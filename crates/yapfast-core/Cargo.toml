@@ -14,7 +14,7 @@ doctest = false
 [features]
 default = ["discord"]
 # Matrix: sign-in, encrypted rooms and MatrixRTC voice.
-matrix = ["dep:keyring", "dep:matrix-sdk", "dep:matrix-sdk-ui", "dep:matrix-sdk-crypto", "dep:matrix-rtc-livekit", "dep:matrix-rtc-core", "dep:matrix-rtc-media", "dep:mime", "dep:url"]
+matrix = ["dep:keyring", "dep:matrix-sdk", "dep:matrix-sdk-ui", "dep:matrix-sdk-crypto", "dep:matrix-rtc-core", "dep:matrix-rtc-call", "dep:matrix-rtc-transport", "dep:matrix-rtc-call-sdk", "dep:mime", "dep:url"]
 # Discord through the account linked on this device; see docs/discord/README.md.
 discord = ["dep:yapfast-discord", "dep:rand", "dep:base64", "dep:nnnoiseless", "dep:df", "dep:ndarray", "dep:x264-src", "dep:ffmpeg-src", "dep:thorvg-sys"]
 # Sample states other crates' tests start from, such as a Discord server
@@ -55,9 +55,10 @@ memmap2 = "0.9"
 matrix-sdk = { workspace = true, optional = true }
 matrix-sdk-ui = { workspace = true, optional = true }
 matrix-sdk-crypto = { workspace = true, optional = true }
-matrix-rtc-livekit = { workspace = true, optional = true }
+matrix-rtc-call = { workspace = true, optional = true }
 matrix-rtc-core = { workspace = true, optional = true }
-matrix-rtc-media = { workspace = true, optional = true }
+matrix-rtc-call-sdk = { workspace = true, optional = true }
+matrix-rtc-transport = { workspace = true, optional = true }
 mime = { version = "0.3", optional = true }
 # Plain-text reply snippets from Markdown; the SDK already uses it to format messages.
 pulldown-cmark = { version = "0.13", default-features = false }
@@ -79,7 +80,7 @@ uuid.workspace = true
 url = { workspace = true, optional = true }
 # Levels the voice in LiveKit's calls, and sends the camera from pooled
 # buffers, through Yapfast's patch to its WebRTC bindings.
-webrtc-sys = "=0.3.35"
+webrtc-sys = "=0.3.54"
 # Holds the camera's video source from those bindings.
 cxx = "1"
 

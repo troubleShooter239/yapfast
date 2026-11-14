@@ -41,8 +41,9 @@ rustPlatform.buildRustPackage {
       "deep_filter-0.5.7-pre" = deepFilterHash;
       "openmls-0.9.0" = "sha256-fNC5L4IV/7qmcNjcJiO1P8TYGLhokLzVdZbT6D9Nox4=";
       "const_panic-0.2.15" = "sha256-zEmo8lKncnNhn2LL5aRT95AZD/LqjmNcRg2qTKXLcic=";
-      "matrix-rtc-bridge-0.4.0-rc.1" = "sha256-Zm+5xARhyrix22Ihz2fesWkwg21FaT/eqi240eT1lnQ=";
-      "matrix-sdk-0.19.1" = "sha256-MzEIaDxJVssAiTd2r7qRSdkZvD+IYpC71shuJU5TATE=";
+      "matrix-rtc-core-0.5.0" = "sha256-wXxwQ1xIpdvchec9+Scr3lNQwD5mRsjj50OFF2MU9rA=";
+      "matrix-sdk-0.19.1" = "sha256-5mBDl913e49ZPY/zcK3NqjuatH+6yyq8qA7yO7/9F/c=";
+      "ruma-0.17.0" = "sha256-bs/aoJb9PW5vrGhbduc38dnRv3KLGxPX+jD0r3sJheo=";
       "slint-1.19.0" = "sha256-gAu/zH5z6UrlEolvzpmcjsFZlJG2PWV96nNRgrdKyFs=";
     };
   };

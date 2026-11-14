@@ -16,8 +16,8 @@ use livekit::{
         video_stream::native::NativeVideoStream,
     },
 };
-use matrix_rtc_livekit::Call;
-use matrix_rtc_media::{Dimensions, MediaConstraints, MediaStreamKind, VideoDetail};
+use matrix_rtc_call_sdk::LiveKitCall as Call;
+use matrix_rtc_transport::{Dimensions, MediaConstraints, MediaStreamKind, VideoDetail};
 use tokio::{sync::Notify, task::JoinHandle};
 
 use crate::{

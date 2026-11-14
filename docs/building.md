@@ -196,7 +196,7 @@ compilers, clear previous build artifacts once before rebuilding.
 LiveKit's Rust crates must stay on the mutually compatible versions in
 Cargo.lock. Do not run an unrestricted `cargo update`. Upgrade against the
 MatrixRTC lockfile and rebuild the native media stack. On Linux, the Nix shell
-supplies libwebrtc `webrtc-51ef663`, matching webrtc-sys-build 0.3.18. Updating
+supplies libwebrtc `webrtc-a545de4`, matching webrtc-sys-build 0.3.21. Updating
 that crate requires updating the archive URL and checksum in `nix/native.nix`
 (Linux) and `nix/flake.nix` (Windows) too.
 
@@ -244,9 +244,9 @@ dependency in Cargo.toml:
   in the `PRESENT` state, which `Present` requires and wgpu can't see is
   missing. Flush errors propagate through the renderer, and only the swapchain
   surface receives the transition to PRESENT.
-- `matrix-rtc-livekit`: Element's matrix-rust-rtc at `5831af8`, with native
+- `matrix-rtc-livekit` and `matrix-rtc-call-sdk`: Element's matrix-rust-rtc at `52af3d1`, with native
   audio tracks and cancellable joins.
-- `webrtc-sys`: webrtc-sys 0.3.35 with a Windows link fix, capture leveling,
+- `webrtc-sys`: webrtc-sys 0.3.54 with capture leveling,
   remote track volume and camera capture from pooled buffers.
 - `davey`: davey 0.1.4 with pinned upstream OpenMLS and authenticated own-commit
   handling, keeping its key packages when a Go Live stream's group
@@ -266,12 +266,12 @@ use it. No local rusqlite patch is applied.
 Run cargo audit after changing Cargo.lock. No advisory exceptions or local
 dependency patches are applied to hide findings.
 
-LiveKit 0.7.48, livekit-api 0.5.3, livekit-protocol 0.7.9 and
-livekit-datatrack 0.1.9 use their published sources, with their compatible
+LiveKit 0.9.7, livekit-signaling 0.1.7, livekit-protocol 0.8.3 and
+livekit-datatrack 0.2.5 use their published sources, with their compatible
 combination recorded in Cargo.lock. Updating those packages requires checking
 them together against the patched native WebRTC ABI. webrtc-sys-build 0.3.21
 also uses its published source: Nix and `scripts/windows-env.ps1` supply
-`LK_CUSTOM_WEBRTC` for the matching `webrtc-51ef663` archive.
+`LK_CUSTOM_WEBRTC` for the matching `webrtc-a545de4` archive.
 
 OpenMLS and its providers use the single upstream revision
 `6100df3fb1d8c3eeab53e349fcbd621f98c44fe2`, through Git dependencies in davey
@@ -303,7 +303,7 @@ root, with no `src/`, both in `vendor/` and in Cargo's registry.
 
 Crates that aren't vendored are in
 `~/.cargo/registry/src/index.crates.io-*/NAME-VERSION/`. The Matrix SDK is a git
-dependency; its checkout is `~/.cargo/git/checkouts/matrix-rust-sdk-*/c6ad52e/`,
+dependency; its checkout is `~/.cargo/git/checkouts/matrix-rust-sdk-*/56bc591/`,
 the short form of the revision pinned in Cargo.toml. libDF's is
 `~/.cargo/git/checkouts/deepfilternet-*/9b8790d/libDF/`. libwebrtc's headers are in
 `$LK_CUSTOM_WEBRTC/include` inside the development shell.
