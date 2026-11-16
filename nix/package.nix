@@ -11,7 +11,11 @@ let
   clangStdenv = pkgs.llvmPackages_23.stdenv;
   # Cargo hooks inject target-specific CC/CXX from rust.envVars.
   # Override that helper as well as the package's stdenv.
-  clangRust = pkgs.rust.override { stdenv = clangStdenv; };
+  clangRust = pkgs.rust.override {
+    stdenv = clangStdenv;
+    # cc-rs uses HOST_CC/HOST_CXX before the unqualified CC/CXX.
+    pkgsBuildHost = pkgs.buildPackages // { stdenv = clangStdenv; };
+  };
   rustPlatform = (pkgs.makeRustPlatform {
     cargo = toolchain;
     rustc = toolchain;
@@ -73,6 +77,9 @@ rustPlatform.buildRustPackage {
   env = {
     CC = "clang";
     CXX = "clang++";
+    # cc-rs checks the lowercase target triple, not Cargo's uppercase form.
+    CC_x86_64_unknown_linux_gnu = "${clangStdenv.cc}/bin/cc";
+    CXX_x86_64_unknown_linux_gnu = "${clangStdenv.cc}/bin/c++";
     PROTOC = "${pkgs.protobuf}/bin/protoc";
     LK_CUSTOM_WEBRTC = "${native.webrtc}";
     SKIA_BINARIES_URL = "file://${native.skia}/${native.skiaPackage}";

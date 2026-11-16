@@ -66,3 +66,13 @@ Verified the generated build hook selects Clang 23.1.0 for the target compiler.
 Replaced constant-size `chunks_exact` calls in the Linux frame recorder with
 `as_chunks` to satisfy Clippy; verified unchanged hashes for 16,388 inputs.
 Full Linux compilation and release packaging remain to be verified.
+
+Fixed the remaining GCC fallback through `HOST_CC`/`HOST_CXX` in Nix Rust
+hooks and explicitly set cc-rs's lowercase target-specific compiler variables.
+Updated constant-size chunk iteration in the tray recorder and Windows audio
+tests for Clippy. Windows workspace Clippy with warnings denied passed; tray
+pixel conversion matched the old implementation for 4,097 inputs.
+
+A Nix smoke build verified cc-rs compiler-variable precedence selects Clang
+23.1.0 for both C and C++, and successfully checked the compiler's Clang 23
+preprocessor macros. Full Linux application/release builds remain unverified.
