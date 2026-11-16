@@ -9,7 +9,23 @@ description = "No code: scripts/check --matrix selects it with Matrix alone, so 
 
 # These dependencies intentionally enable features without Rust imports.
 [package.metadata.cargo-machete]
-ignored = ["arrayvec", "bitflags", "chrono", "getrandom", "idna", "indexmap", "itertools", "phf_shared", "pulldown-cmark", "serde", "serde_core", "smallvec", "thiserror", "url", "zerocopy"]
+ignored = [
+  "arrayvec",
+  "bitflags",
+  "chrono",
+  "getrandom",
+  "idna",
+  "indexmap",
+  "itertools",
+  "phf_shared",
+  "pulldown-cmark",
+  "serde",
+  "serde_core",
+  "smallvec",
+  "thiserror",
+  "url",
+  "zerocopy",
+]
 
 [lib]
 doctest = false

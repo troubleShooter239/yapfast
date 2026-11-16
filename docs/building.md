@@ -602,7 +602,6 @@ cargo audit
 `--fast` is an option of `scripts/check`, not of Cargo itself. Cargo selects
 this profile with `--profile fast`; Clippy compiler flags follow `--`.
 
-
 Before accepting the Windows build, check text entry, selection, copy/paste,
 keyboard focus, navigation, both renderers, resizing, normal close, and reopen
 on the tester's actual GPU.

@@ -7,16 +7,16 @@ For each new merge, add an entry with the date, branch name, and merge commit.
 
 Merged into `testing`:
 
-| Branch | Changes | Merge commit |
-| --- | --- | --- |
-| `chore/basic-ci` | CI, prek hooks, formatting and code style configuration | `a338c94d` |
-| `chore/deps-and-lint` | Dependency updates and lint fixes | `1e1aba91` |
-| `feat/check-microphone` | Microphone testing and level meter | `768c991a` |
-| `feat/go-live-preview-and-resolution` | Go Live preview and resolution selection | `602bb1ae` |
-| `feat/stream-audio-controls` | Stream audio controls and window previews | `bb6641f4` |
-| `fix/twemoji-font-smoothing` | Twemoji and font smoothing settings | `dbab7713` |
-| `fix/video-codecs-and-orientation` | HEVC support and video orientation fixes | `d4693c30` |
-| `fix/high-cpu-usage-in-server` | Scrolling and CPU usage optimizations | `e50e972b` |
+| Branch                                | Changes                                                 | Merge commit |
+| ------------------------------------- | ------------------------------------------------------- | ------------ |
+| `chore/basic-ci`                      | CI, prek hooks, formatting and code style configuration | `a338c94d`   |
+| `chore/deps-and-lint`                 | Dependency updates and lint fixes                       | `1e1aba91`   |
+| `feat/check-microphone`               | Microphone testing and level meter                      | `768c991a`   |
+| `feat/go-live-preview-and-resolution` | Go Live preview and resolution selection                | `602bb1ae`   |
+| `feat/stream-audio-controls`          | Stream audio controls and window previews               | `bb6641f4`   |
+| `fix/twemoji-font-smoothing`          | Twemoji and font smoothing settings                     | `dbab7713`   |
+| `fix/video-codecs-and-orientation`    | HEVC support and video orientation fixes                | `d4693c30`   |
+| `fix/high-cpu-usage-in-server`        | Scrolling and CPU usage optimizations                   | `e50e972b`   |
 
 `fix/windows-restart-hang` is already included in the base `main` branch,
 so it was not merged separately. The fork owner chose to exclude
