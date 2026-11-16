@@ -47,3 +47,15 @@ the reported fixed-output hash mismatch during Cargo vendoring.
 Fixed Linux CI selecting Clang 23 while installing Clang 18. Added the signed
 LLVM APT repository, installed Clang/libclang/LLVM 23, and added a toolchain
 check before Cargo runs.
+
+Moved both Nix flakes to `nixos-26.05` and selected LLVM 23 consistently for
+the application and development shells. The Rust package now uses LLVM's
+Clang stdenv so native dependencies do not fall back to GCC. Documented how
+to update both nixpkgs lock files.
+
+Selected Python 3.15.2 from the updated nixpkgs in both Nix shells and Skia
+preparation, and aligned Ruff's formatter target with Python 3.15.
+
+Validated Nix evaluation of the application (Clang 23.1.0), AppImage and both
+development shells. Full release builds and AppImage runtime compatibility
+have not yet been validated with the updated nixpkgs.

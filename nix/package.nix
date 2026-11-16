@@ -8,7 +8,11 @@ let
   inherit (pkgs) lib;
   native = import ./native.nix { inherit pkgs; };
   toolchain = pkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
-  rustPlatform = pkgs.makeRustPlatform { cargo = toolchain; rustc = toolchain; };
+  rustPlatform = pkgs.makeRustPlatform {
+    cargo = toolchain;
+    rustc = toolchain;
+    stdenv = pkgs.llvmPackages_23.stdenv;
+  };
   id = "io.github.yapfast.Yapfast";
   deepFilterHash = "sha256-1xe1HSLnaUoPkFvi6R+/G4I74XP8YK1QJmTmIoBgkCc=";
   # deep_filter embeds a model from its repository's models/ folder, outside
@@ -50,7 +54,7 @@ rustPlatform.buildRustPackage {
   buildNoDefaultFeatures = true;
   buildFeatures = [ "desktop" "discord" ];
   nativeBuildInputs = with pkgs; [
-    pkg-config cmake llvmPackages_21.clang llvmPackages_21.llvm protobuf
+    pkg-config cmake llvmPackages_23.clang llvmPackages_23.llvm protobuf
     # Assembles x264's x86-64 code (vendor/x264-src).
     nasm
     # Skia's build script fetches its archive with curl, even from a file:// URL.

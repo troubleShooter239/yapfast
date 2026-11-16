@@ -66,3 +66,20 @@ to upstream releases; they do not follow this fork's testing builds.
 
 For local builds, follow [building.md](building.md). Native Windows builds are
 for local development; use the workflow for distributable packages.
+
+## Update nixpkgs
+
+The root flake builds the application; `nix/flake.nix` supplies the development
+and packaging shells. Both track `nixos-26.05` and should use the same nixpkgs
+revision. From the repository root, update only nixpkgs in both lock files:
+
+```sh
+nix flake update nixpkgs
+nix flake update nixpkgs --flake path:./nix
+```
+
+To move to another nixpkgs release, first change `inputs.nixpkgs.url` in both
+`flake.nix` and `nix/flake.nix`, then run those commands. Review both lock-file
+diffs and build the packages before publishing. Updating nixpkgs can change
+native dependencies and the glibc/libstdc++ versions required by the AppImage;
+keep the compatibility checks in `nix/appimage.nix` enabled.
