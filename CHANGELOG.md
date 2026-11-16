@@ -59,3 +59,10 @@ preparation, and aligned Ruff's formatter target with Python 3.15.
 Validated Nix evaluation of the application (Clang 23.1.0), AppImage and both
 development shells. Full release builds and AppImage runtime compatibility
 have not yet been validated with the updated nixpkgs.
+
+Fixed Nix Cargo build/check hooks injecting GCC target compiler variables despite
+the package using Clang stdenv. Both hooks now use Clang's Rust environment helper.
+Verified the generated build hook selects Clang 23.1.0 for the target compiler.
+Replaced constant-size `chunks_exact` calls in the Linux frame recorder with
+`as_chunks` to satisfy Clippy; verified unchanged hashes for 16,388 inputs.
+Full Linux compilation and release packaging remain to be verified.

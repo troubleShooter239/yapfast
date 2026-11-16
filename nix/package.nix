@@ -8,11 +8,18 @@ let
   inherit (pkgs) lib;
   native = import ./native.nix { inherit pkgs; };
   toolchain = pkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
-  rustPlatform = pkgs.makeRustPlatform {
+  clangStdenv = pkgs.llvmPackages_23.stdenv;
+  # Cargo hooks inject target-specific CC/CXX from rust.envVars.
+  # Override that helper as well as the package's stdenv.
+  clangRust = pkgs.rust.override { stdenv = clangStdenv; };
+  rustPlatform = (pkgs.makeRustPlatform {
     cargo = toolchain;
     rustc = toolchain;
-    stdenv = pkgs.llvmPackages_23.stdenv;
-  };
+    stdenv = clangStdenv;
+  }).overrideScope (final: prev: {
+    cargoBuildHook = prev.cargoBuildHook.override { rust = clangRust; };
+    cargoCheckHook = prev.cargoCheckHook.override { rust = clangRust; };
+  });
   id = "io.github.yapfast.Yapfast";
   deepFilterHash = "sha256-1xe1HSLnaUoPkFvi6R+/G4I74XP8YK1QJmTmIoBgkCc=";
   # deep_filter embeds a model from its repository's models/ folder, outside
