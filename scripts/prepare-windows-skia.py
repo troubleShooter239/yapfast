@@ -179,7 +179,7 @@ def open_https(url):
                 "GET", request_path, headers={"User-Agent": "Yapfast Skia preparation"}
             )
             response = connection.getresponse()
-        except OSError, http.client.HTTPException:
+        except (OSError, http.client.HTTPException):
             connection.close()
             raise
         if response.status in (301, 302, 303, 307, 308):
@@ -466,7 +466,7 @@ def ensure_source():
     if manifest_path.is_file():
         try:
             previous = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except OSError, json.JSONDecodeError:
+        except (OSError, json.JSONDecodeError):
             previous = None
     if previous == expected and source_tree_is_usable():
         say("Pinned source tree is already laid out")
@@ -1009,7 +1009,7 @@ def run_native_prepare(raw, raw_hash, llvm):
 def read_json(path):
     try:
         return json.loads(Path(path).read_text(encoding="utf-8"))
-    except OSError, json.JSONDecodeError:
+    except (OSError, json.JSONDecodeError):
         return None
 
 

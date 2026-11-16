@@ -1,4 +1,5 @@
-target-version = "py315"
+# Keep scripts compatible with the Python interpreter supplied by Nix.
+target-version = "py313"
 line-length = 100
 extend-exclude = [".venv", "venv", "vendor", ".local", "target", "node_modules"]
 

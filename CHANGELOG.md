@@ -31,3 +31,7 @@ Packaging in Actions and the combined changes at runtime have not yet been verif
 Merged `chore/basic-ci` while retaining the testing README, updated dependencies,
 HEVC support and video orientation fixes. Enabled CI for pushes and PRs targeting
 `testing`. Fixed the contribution guide's link after the README replacement.
+
+Fixed Skia preparation scripts failing under Nix's Python interpreter: restored
+parentheses around exception tuples and set Ruff's Python target to 3.13 to
+prevent the formatter from introducing newer exception syntax.
