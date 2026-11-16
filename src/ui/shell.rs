@@ -416,6 +416,7 @@ impl Adapter {
     /// the next window shows them without building them again.
     pub(super) fn detach(&mut self) {
         self.pause_share_preview(true);
+        self.animations.detach();
         self.meter = None;
         #[cfg(feature = "discord")]
         {

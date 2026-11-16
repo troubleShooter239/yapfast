@@ -3162,6 +3162,9 @@ impl Adapter {
         {
             return;
         }
+        // A scroll only changes which media to prepare and which emoji play.
+        // Backend arrivals refresh their own areas when they arrive.
+        let viewport = matches!(action, Action::VisibleMessages { .. });
         // A keystroke in the composer changes only the composer, and one in
         // the profile editor only the editor; the rest of the window
         // stays as it is.
@@ -3205,11 +3208,16 @@ impl Adapter {
                 | Action::CacheEmojiPictures
         );
         let effects = self.app.dispatch(action);
+        if viewport && effects.is_empty() {
+            return;
+        }
         self.execute(effects);
         if quiet {
             return;
         }
-        if channel_setting {
+        if viewport {
+            self.show_emoji_animations(window);
+        } else if channel_setting {
             self.show_channel_settings(window);
         } else if composing {
             self.show_composer(window);

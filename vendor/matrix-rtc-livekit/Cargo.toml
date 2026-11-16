@@ -14,6 +14,10 @@ description = "MSC4195 LiveKit transport for MatrixRTC: SFU token exchange, medi
 [lib]
 crate-type = ["rlib"]
 
+# Used by the matrix-sdk feature to forward unstable-msc4354 to SDK UI.
+[package.metadata.cargo-machete]
+ignored = ["matrix-sdk-ui"]
+
 [dependencies]
 matrix-rtc-core = { git = "https://github.com/element-hq/matrix-rust-rtc", rev = "52af3d1f4dc6af5c92ce5f8c64418fd97a8c4f57" }
 # The transport contract this crate implements (`transport_impl`), and the pure
