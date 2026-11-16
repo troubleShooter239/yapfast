@@ -42,10 +42,6 @@ itertools = "0.13"
 phf_shared = "0.13"
 thiserror = "2"
 
-# This code-free crate aligns dependency features for Matrix builds.
-[package.metadata.cargo-machete]
-ignored = ["arrayvec","bitflags","chrono","getrandom","idna","indexmap","itertools","phf_shared","pulldown-cmark","serde","serde_core","smallvec","thiserror","url","zerocopy"]
-
 # These build dependencies intentionally only unify features for Matrix builds.
 [lints.cargo]
 unused_dependencies = "allow"

@@ -2127,6 +2127,7 @@ mod tests {
             fps: 30,
             effort: Effort::Light,
             hardware: false,
+            enhanced_preview: false,
             started: Instant::now(),
             streaming: false,
             preview_due: None,
@@ -2360,6 +2361,8 @@ mod tests {
         let window = Report::Screen {
             id: 7,
             window: true,
+            source_width: 2,
+            source_height: 1,
             width: 2,
             height: 1,
             rgba: vec![255; 8],
@@ -2400,6 +2403,7 @@ mod tests {
                     width,
                     height,
                     rgba,
+                    ..
                 } => {
                     assert!(window, "window previews must not be routed to displays");
                     assert!(windows.contains(&id));

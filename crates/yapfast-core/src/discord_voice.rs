@@ -51,7 +51,8 @@ impl Share {
             stream_worker::Source::Screen
         };
         let enhanced_preview = stream_worker::enhanced_preview();
-        let (worker, frames, reports) = Worker::share(source, quality, enhanced_preview, state.stream_audio)?;
+        let (worker, frames, reports) =
+            Worker::share(source, quality, enhanced_preview, state.stream_audio)?;
         state.sharing = Some(Sharing {
             phase: SharePhase::Choosing,
             enhanced_preview,
