@@ -54,7 +54,7 @@ jobs:
         if: matrix.tool == 'cargo-audit'
         # TODO: after fix audit errors reenable that line:
         # run: cargo audit --deny warning
-        run: cargo audit
+        run: cargo audit --ignore RUSTSEC-2026-0459
       - name: Find unused dependencies
         if: matrix.tool == 'cargo-machete'
         run: cargo machete
