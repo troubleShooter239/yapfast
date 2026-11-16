@@ -75,7 +75,7 @@ if stamp_path.is_file() and archive_path.is_file() and upstream_path.is_file():
     # A stamp an interrupted run left is no stamp: build it again.
     try:
         previous: dict[str, object] = json.loads(stamp_path.read_text())
-    except (OSError, ValueError):
+    except OSError, ValueError:
         previous = {}
     if (
         all(previous.get(k) == v for k, v in stamp.items())
