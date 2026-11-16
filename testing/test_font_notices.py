@@ -30,6 +30,18 @@ class FontNoticesTest(unittest.TestCase):
             for name, text in notices.items():
                 (fonts / name).write_text(text)
             (fonts / "DMSans-Regular.ttf").write_bytes(b"font embedded in binary")
+            (root / "src").mkdir()
+            (root / "src/LICENSE-emojibase.txt").write_text("emojibase license")
+            twemoji = root / "vendor/twemoji"
+            twemoji.mkdir(parents=True)
+            for name in (
+                "LICENSE-GRAPHICS",
+                "LICENSE",
+                "README.md",
+                "README.yapfast.md",
+                "REVISION",
+            ):
+                (twemoji / name).write_text("twemoji attribution")
             package = root / "package"
             package.mkdir()
             skia = root / "skia"

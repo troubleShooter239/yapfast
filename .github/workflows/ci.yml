@@ -28,12 +28,17 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.15"
       - uses: j178/prek-action@e255e0dfb748c18fd93df34c3eb853e9a999c6aa # v3.1.0
         with:
           prek-version: "0.5.2"
       # rustup reads the pinned version and components from rust-toolchain.toml.
       - run: cargo fmt --all -- --check
       - run: python3 scripts/check-doc-links
+      - name: Python build-tool regression tests
+        run: python -m unittest testing.test_python_tools testing.test_font_notices -v
 
   dependencies:
     name: Dependencies (${{ matrix.tool }})
