@@ -25,7 +25,7 @@ hash there; a `nix build` with the old one prints it.
 
 ## Dependencies
 
-Yapfast pins Rust 1.97.1, Slint's master at `ac7d423f` and Skia 0.157.0.
+Yapfast pins Rust 1.100.0, Slint's master at `ac7d423f` and Skia 0.157.0.
 Cargo.lock pins the complete Rust graph. That commit calls itself 1.19.0, which
 isn't released: `[patch.crates-io]` in Cargo.toml takes `=1.19.0` and the crates
 it needs from the commit. Its generated Rust compiles in half the time of
@@ -187,14 +187,16 @@ taking the new commit's files over these, as `vendor/twemoji/README.yapfast.md`
 says.
 
 libDF, DeepFilterNet's Rust implementation, comes from DeepFilterNet's
-repository at `d375b2d`, since crates.io has only its 0.2.5. It asks for
-tract `^0.21.4`, but tract 0.21.10 changed an API it uses, so Cargo.lock keeps
-tract at 0.21.4, the version DeepFilterNet's own lockfile has.
+repository at `9b8790dc`. Cargo.lock keeps tract at 0.23.4, matching that
+commit's own lockfile, and the application uses ndarray 0.17 to match libDF.
+Later tract 0.23 releases changed the Tensor and TValue APIs libDF uses.
+For native Windows builds, use the compiler environment below. After changing
+compilers, clear previous build artifacts once before rebuilding.
 
 LiveKit's Rust crates must stay on the mutually compatible versions in
 Cargo.lock. Do not run an unrestricted `cargo update`. Upgrade against the
 MatrixRTC lockfile and rebuild the native media stack. On Linux, the Nix shell
-supplies libwebrtc `webrtc-51ef663`, matching webrtc-sys-build 0.3.18. Updating
+supplies libwebrtc `webrtc-a545de4`, matching webrtc-sys-build 0.3.21. Updating
 that crate requires updating the archive URL and checksum in `nix/native.nix`
 (Linux) and `nix/flake.nix` (Windows) too.
 
@@ -240,15 +242,42 @@ dependency in Cargo.toml:
   restores a minimized window at its old size without its pixels, which
   partial rendering left black. On Direct3D 12 it also hands each frame back
   in the `PRESENT` state, which `Present` requires and wgpu can't see is
-  missing.
-- `matrix-rtc-livekit`: Element's matrix-rust-rtc at `5831af8`, with native
+  missing. Flush errors propagate through the renderer, and only the swapchain
+  surface receives the transition to PRESENT.
+- `matrix-rtc-livekit` and `matrix-rtc-call-sdk`: Element's matrix-rust-rtc at `52af3d1`, with native
   audio tracks and cancellable joins.
-- `webrtc-sys`: webrtc-sys 0.3.35 with a Windows link fix, capture leveling,
+- `webrtc-sys`: webrtc-sys 0.3.54 with capture leveling,
   remote track volume and camera capture from pooled buffers.
-- `davey`: davey 0.1.4, keeping its key packages when a Go Live stream's group
+- `davey`: davey 0.1.4 with pinned upstream OpenMLS and authenticated own-commit
+  handling, keeping its key packages when a Go Live stream's group
   id changes, and reading a frame's overlong nonce without panicking.
-- `tungstenite`: tungstenite 0.26.2, giving back the read buffer a large frame
+- `tungstenite`: tungstenite 0.30.0, giving back the read buffer a large frame
   such as Discord's READY grew.
+
+DeepFilterNet remains a Git dependency pinned to
+`9b8790dca0fbc6e3625b5d0b9aef7b90740f3563`, using its upstream ndarray and
+tract APIs. Nix copies the unchanged model from that Git source when vendoring
+Cargo dependencies. There is no local DeepFilterNet source copy.
+
+SQLite is not a direct application dependency. Only the optional Matrix SDK
+pulls in its published rusqlite dependency; the default Discord build does not
+use it. No local rusqlite patch is applied.
+
+Run cargo audit after changing Cargo.lock. No advisory exceptions or local
+dependency patches are applied to hide findings.
+
+LiveKit 0.9.7, livekit-signaling 0.1.7, livekit-protocol 0.8.3 and
+livekit-datatrack 0.2.5 use their published sources, with their compatible
+combination recorded in Cargo.lock. Updating those packages requires checking
+them together against the patched native WebRTC ABI. webrtc-sys-build 0.3.21
+also uses its published source: Nix and `scripts/windows-env.ps1` supply
+`LK_CUSTOM_WEBRTC` for the matching `webrtc-a545de4` archive.
+
+OpenMLS and its providers use the single upstream revision
+`6100df3fb1d8c3eeab53e349fcbd621f98c44fe2`, through Git dependencies in davey
+and the Discord test manifest. Its source checksum is in nix/package.nix.
+No local OpenMLS, LiveKit, build-helper, tract-data or tract-linalg copies
+are needed in vendor/.
 
 `vendor/x264-src` isn't a patched crate but x264's own C source, unchanged and
 trimmed to what an 8-bit encoder library uses, with a build script in place of
@@ -274,9 +303,9 @@ root, with no `src/`, both in `vendor/` and in Cargo's registry.
 
 Crates that aren't vendored are in
 `~/.cargo/registry/src/index.crates.io-*/NAME-VERSION/`. The Matrix SDK is a git
-dependency; its checkout is `~/.cargo/git/checkouts/matrix-rust-sdk-*/c6ad52e/`,
+dependency; its checkout is `~/.cargo/git/checkouts/matrix-rust-sdk-*/56bc591/`,
 the short form of the revision pinned in Cargo.toml. libDF's is
-`~/.cargo/git/checkouts/deepfilternet-*/d375b2d/libDF/`. libwebrtc's headers are in
+`~/.cargo/git/checkouts/deepfilternet-*/9b8790d/libDF/`. libwebrtc's headers are in
 `$LK_CUSTOM_WEBRTC/include` inside the development shell.
 
 ### Media libraries
@@ -512,7 +541,7 @@ building in the Nix sandbox.
 
 The supported and packaged build route remains the Linux MSVC cross-build.
 A native Windows build is for development only: it names this machine's folders
-and must not be shipped. It needs Rust 1.97.1, Visual Studio C++ tools and the
+and must not be shipped. It needs Rust 1.100.0, Visual Studio C++ tools and the
 Windows 10/11 SDK, LLVM with `clang-cl`, `llvm-rc` and `libclang` on `PATH`
 (the SDK's `rc.exe` can replace `llvm-rc`), and NASM on `PATH`. bindgen, which
 `thorvg-sys` runs, finds `libclang` only through `LIBCLANG_PATH`, `llvm-config
@@ -539,7 +568,9 @@ conflict with a user-level Cargo config would prevent Cargo from starting.
 
 ```powershell
 python scripts/prepare-windows-skia.py
-python scripts/prepare-windows-skia.py --print-env
+# Fetch the pinned WebRTC archive if no matching local cache exists,
+# select the prepared Skia archive, and set LLVM/NASM for this shell.
+. ./scripts/windows-env.ps1 -Prepare
 cargo build --release
 ```
 
@@ -549,6 +580,24 @@ and nothing else: the build that follows sees the environment the script ran
 in, so `clang-cl`, `llvm-rc` and `LIBCLANG_PATH` have to be set here too, as
 for a plain `cargo build --release`. The downloadable package
 needs none of these tools to run.
+
+For native checks, run the environment setup in the same PowerShell session.
+It explicitly sets both `CC` and `CXX` to the `clang-cl` found on `PATH`,
+replacing any previous values for this session. After switching compilers,
+run `cargo clean` once after the setup, then rebuild; this is not needed on
+every run. If you use a custom target directory, clean that directory too.
+
+```powershell
+. ./scripts/windows-env.ps1
+cargo check --locked --all-targets --profile fast
+cargo test --locked --all-targets --profile fast
+cargo clippy --locked --all-targets --profile fast -- -D warnings
+cargo audit
+```
+
+`--fast` is an option of `scripts/check`, not of Cargo itself. Cargo selects
+this profile with `--profile fast`; Clippy compiler flags follow `--`.
+
 
 Before accepting the Windows build, check text entry, selection, copy/paste,
 keyboard focus, navigation, both renderers, resizing, normal close, and reopen

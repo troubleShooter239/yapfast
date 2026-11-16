@@ -85,10 +85,12 @@ impl Output {
         self.0.drain().map_err(|error| anyhow!("{error}"))
     }
 
+    #[cfg(feature = "discord")]
     pub fn flush(&mut self) {
         let _ = self.0.flush();
     }
 
+    #[cfg(feature = "discord")]
     pub fn latency(&self) -> Duration {
         self.0
             .get_latency()
@@ -561,11 +563,13 @@ mod others {
                                 ([], samples, []) => samples,
                                 _ => {
                                     unaligned.clear();
-                                    unaligned.extend(bytes.chunks_exact(4).map(|sample| {
-                                        f32::from_ne_bytes([
-                                            sample[0], sample[1], sample[2], sample[3],
-                                        ])
-                                    }));
+                                    unaligned.extend(bytes.as_chunks::<4>().0.iter().map(
+                                        |sample| {
+                                            f32::from_ne_bytes([
+                                                sample[0], sample[1], sample[2], sample[3],
+                                            ])
+                                        },
+                                    ));
                                     &unaligned
                                 }
                             };

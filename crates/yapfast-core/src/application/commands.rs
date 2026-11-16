@@ -160,11 +160,11 @@ impl Application {
     /// Drops the kept index if it's `guild`'s or a DM's, which may be with
     /// one of its bots, or with none whichever it is, so the next `/` asks
     /// again. Gives the room of one on its way, whose answer is dropped.
-    fn forget_command_index(&mut self, guild: Option<&str>) -> Option<String> {
+    fn forget_command_index(&mut self, _guild: Option<&str>) -> Option<String> {
         let commands = &mut self.state.app_commands;
         let of_guild = |room: &str| {
             #[cfg(feature = "discord")]
-            return guild.is_none_or(|guild| {
+            return _guild.is_none_or(|guild| {
                 discord::parse_room(room)
                     .is_none_or(|(its, _)| its == guild || its == discord::DM_GUILD)
             });

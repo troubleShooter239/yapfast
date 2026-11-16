@@ -11534,6 +11534,7 @@ fn the_mouse_side_buttons_go_back_and_forward() {
 
 #[cfg(feature = "discord")]
 #[test]
+#[cfg(feature = "discord")]
 fn a_profiles_more_menu_blocks_from_the_profile() {
     i_slint_backend_testing::init_no_event_loop();
     let directory = tempfile::tempdir().unwrap();

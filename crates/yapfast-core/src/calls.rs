@@ -13,7 +13,7 @@ use livekit::{
         prelude::AudioFrame,
     },
 };
-use matrix_rtc_livekit::{Call, CallOptions};
+use matrix_rtc_call_sdk::{LiveKitCall as Call, LiveKitCallOptions as CallOptions};
 use matrix_sdk::Room;
 use serde::Serialize;
 use std::{borrow::Cow, collections::BTreeMap, time::Duration};
@@ -76,7 +76,7 @@ async fn experiment(
     for room in &rooms {
         require_trusted_encrypted_room(room).await?;
     }
-    matrix_rtc_livekit::open_slot(
+    matrix_rtc_call_sdk::open_slot(
         &rooms[0].client(),
         rooms[0].room_id().as_str(),
         "m.call#ROOM",
@@ -127,7 +127,9 @@ pub(crate) async fn require_trusted_encrypted_room(room: &Room) -> Result<()> {
 
 fn local_options() -> CallOptions {
     CallOptions {
-        livekit_service_url_fallback: Some("http://localhost:16080".into()),
+        livekit_transport: Some(matrix_rtc_core::LiveKitTransport::service(
+            "http://localhost:16080",
+        )),
         ..Default::default()
     }
 }
@@ -166,7 +168,8 @@ async fn experiment_audio(rooms: &[Room], calls: &mut Vec<Call>) -> Result<Exper
 
     // Negative control: replace Bob's Alice key, leaving the media path running.
     let alice_identity = calls[0].local_identity().to_owned().into();
-    let manager = calls[1].session().room().e2ee_manager();
+    let session = calls[1].session();
+    let manager = session.room().e2ee_manager();
     let provider = manager
         .key_provider()
         .context("no frame encryption key provider")?;
@@ -451,7 +454,7 @@ async fn tone_energy(stream: &mut NativeAudioStream, frequency: f64) -> Result<f
 
 pub fn check_native_build() {
     // Exercise both crates' public APIs so the native stack is linked in the smoke test.
-    let _ = matrix_rtc_livekit::CallOptions::default();
+    let _ = matrix_rtc_call_sdk::LiveKitCallOptions::default();
     let _ = livekit::RoomOptions::default();
     // Allocate a synthetic source to verify the C++ bindings without microphone access.
     let _ = livekit::webrtc::audio_source::native::NativeAudioSource::new(

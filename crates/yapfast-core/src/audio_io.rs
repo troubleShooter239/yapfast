@@ -76,7 +76,7 @@ fn raise(thread: &str, priority: Priority) {
 
 /// Which audio threads a thread joins in priority.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[cfg_attr(not(feature = "discord"), allow(dead_code))]
+#[cfg(feature = "discord")]
 enum Priority {
     /// Threads that play: a call's and the speakers'.
     Playback,
@@ -271,13 +271,13 @@ impl<S: Sample> Output<S> {
     }
 
     /// Drops everything queued and not yet played.
-    #[cfg_attr(not(feature = "discord"), allow(dead_code))]
+    #[cfg(feature = "discord")]
     pub fn flush(&mut self) {
         self.stream.flush();
     }
 
     /// How long until what's written now is heard.
-    #[cfg_attr(not(feature = "discord"), allow(dead_code))]
+    #[cfg(feature = "discord")]
     pub fn latency(&self) -> Duration {
         self.stream.latency()
     }
@@ -353,6 +353,7 @@ type Hear = Box<dyn FnMut(Heard<'_>) + Send>;
 mod tests {
     use super::*;
 
+    #[cfg(feature = "discord")]
     #[test]
     fn the_priority_switch_names_threads() {
         for unset in [None, Some(""), Some("0")] {
@@ -478,7 +479,7 @@ mod tests {
                 .unwrap();
         let mut frame = [0f32; RATE as usize / 50 * 2];
         for start in (0..RATE as usize).step_by(frame.len() / 2) {
-            for (at, pair) in frame.chunks_exact_mut(2).enumerate() {
+            for (at, pair) in frame.as_chunks_mut::<2>().0.iter_mut().enumerate() {
                 pair.fill(tone(start + at));
             }
             output.write(&frame).unwrap();
@@ -537,7 +538,9 @@ mod tests {
         hearing.join().unwrap();
         let other = heard.lock().unwrap().clone();
         let crossings = other
-            .chunks_exact(2)
+            .as_chunks::<2>()
+            .0
+            .iter()
             .map(|pair| pair[0])
             .collect::<Vec<_>>()
             .windows(2)

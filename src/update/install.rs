@@ -94,6 +94,10 @@ pub fn target_for(
             _ => "There's no AppImage for this version yet.".to_owned(),
         })?
         .clone();
+    // Release metadata is remote input: never let a filename escape the download folder.
+    if asset.name.contains(['/', '\\', ':']) {
+        return Err("The release has an invalid download filename.".into());
+    }
     sums_of(release).ok_or("This release doesn't publish SHA256SUMS.txt.")?;
     signature_of(release).ok_or(UNSIGNED)?;
     match source {
@@ -516,6 +520,27 @@ mod tests {
                 asset("SHA256SUMS.txt"),
                 asset("SHA256SUMS.txt.minisig"),
             ],
+        }
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn rejects_download_names_that_escape_the_update_folder() {
+        let folder = tempfile::tempdir().unwrap();
+        let program = folder.path().join("yapfast.exe");
+        std::fs::write(folder.path().join("unins000.exe"), b"").unwrap();
+        for name in [
+            "../bad-windows-x64-setup.exe",
+            "..\\bad-windows-x64-setup.exe",
+            "C:bad-windows-x64-setup.exe",
+        ] {
+            let mut release = release();
+            release.assets[2].name = name.into();
+            let error = target_for(&release, Source::Installer, &program, None).unwrap_err();
+            assert!(
+                error.contains("invalid download filename"),
+                "{name}: {error}"
+            );
         }
     }
 

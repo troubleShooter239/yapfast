@@ -31,8 +31,10 @@ impl Output {
         bail!(UNSUPPORTED)
     }
 
+    #[cfg(feature = "discord")]
     pub fn flush(&mut self) {}
 
+    #[cfg(feature = "discord")]
     pub fn latency(&self) -> Duration {
         Duration::ZERO
     }
