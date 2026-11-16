@@ -3144,7 +3144,7 @@ pub(super) fn bind_callbacks(window: &YapfastWindow, adapter: &Rc<RefCell<Adapte
                     .iter()
                     .map(|listed| ShareScreen {
                         title: listed.title.as_str().into(),
-                        picture: Default::default(),
+                        ..Default::default()
                     })
                     .collect();
                 window.set_share_windows(Rc::new(VecModel::from(window_rows)).into());

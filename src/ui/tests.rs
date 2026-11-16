@@ -1937,7 +1937,7 @@ fn stream_window_pickers_share_one_scroll_area_in_a_fixed_height_menu() {
     window.set_share_lists(true);
     window.set_share_screens(ModelRc::new(VecModel::from(vec![ShareScreen {
         title: "Entire screen".into(),
-        picture: Default::default(),
+        ..Default::default()
     }])));
     let titles = |prefix: &str| {
         (0..32)
@@ -1948,7 +1948,7 @@ fn stream_window_pickers_share_one_scroll_area_in_a_fixed_height_menu() {
         .into_iter()
         .map(|title| ShareScreen {
             title,
-            picture: Default::default(),
+            ..Default::default()
         })
         .collect::<Vec<_>>();
     window.set_share_windows(ModelRc::new(VecModel::from(cards)));
@@ -2136,7 +2136,7 @@ fn the_share_menu_fits_a_short_window_and_keeps_its_button() {
     let cards = (0..12)
         .map(|index| ShareScreen {
             title: format!("Window {index}").into(),
-            picture: Default::default(),
+            ..Default::default()
         })
         .collect::<Vec<_>>();
     window.set_share_windows(ModelRc::new(VecModel::from(cards)));
