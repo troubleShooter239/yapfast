@@ -1,27 +1,28 @@
 # Changelog
 
-Здесь фиксируются ветки, влитые в `testing` для совместного тестирования PR.
-При каждом новом слиянии добавляй запись с датой, именем ветки и merge-коммитом.
+This file records branches merged into `testing` to test PRs together.
+For each new merge, add an entry with the date, branch name, and merge commit.
 
 ## 2026-11-16
 
-В `testing` влиты:
+Merged into `testing`:
 
-| Ветка | Изменения | Merge-коммит |
+| Branch | Changes | Merge commit |
 | --- | --- | --- |
-| `chore/deps-and-lint` | Обновления зависимостей и исправления линтера | `1e1aba91` |
-| `feat/check-microphone` | Проверка микрофона и индикатор уровня | `768c991a` |
-| `feat/go-live-preview-and-resolution` | Предпросмотр Go Live и выбор разрешения | `602bb1ae` |
-| `feat/stream-audio-controls` | Управление звуком стрима и предпросмотр окон | `bb6641f4` |
-| `fix/twemoji-font-smoothing` | Twemoji и настройки сглаживания шрифтов | `dbab7713` |
-| `fix/video-codecs-and-orientation` | HEVC и исправления ориентации видео | `d4693c30` |
-| `fix/high-cpu-usage-in-server` | Оптимизации прокрутки и нагрузки на CPU | `e50e972b` |
+| `chore/deps-and-lint` | Dependency updates and lint fixes | `1e1aba91` |
+| `feat/check-microphone` | Microphone testing and level meter | `768c991a` |
+| `feat/go-live-preview-and-resolution` | Go Live preview and resolution selection | `602bb1ae` |
+| `feat/stream-audio-controls` | Stream audio controls and window previews | `bb6641f4` |
+| `fix/twemoji-font-smoothing` | Twemoji and font smoothing settings | `dbab7713` |
+| `fix/video-codecs-and-orientation` | HEVC support and video orientation fixes | `d4693c30` |
+| `fix/high-cpu-usage-in-server` | Scrolling and CPU usage optimizations | `e50e972b` |
 
-`fix/windows-restart-hang` уже входит в базовый `main`, поэтому отдельно не вливалась.
-Ветки `chore/basic-ci`, `feat/window-transparency` и `feat/voice-hotkeys`
-отдельно не вливались по выбору владельца форка.
+`fix/windows-restart-hang` is already included in the base `main` branch,
+so it was not merged separately. The fork owner chose to exclude
+`chore/basic-ci`, `feat/window-transparency`, and `feat/voice-hotkeys`
+from the branch merges.
 
-Настроена сборка выбранного коммита для Windows и Linux с возможностью выпуска
-тестового prerelease. Исправлены конфликты и несовместимости между влитыми ветками;
-проверка компиляции всех targets на Windows прошла. Выпуск пакетов в Actions
-и работа объединённых изменений в приложении пока не проверены.
+Configured builds of the selected commit for Windows and Linux, with optional
+publication as a testing prerelease. Resolved merge conflicts and incompatibilities
+between the merged branches; compilation checks for all targets passed on Windows.
+Packaging in Actions and the combined changes at runtime have not yet been verified.

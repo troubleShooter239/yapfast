@@ -1,17 +1,17 @@
 # Yapfast — testing
 
-Эта ветка моего форка нужна для выпуска собственных тестовых релизов Yapfast.
-Здесь объединяются изменения из моих PR, чтобы проверять их совместную работу
-и выявлять, не ломают ли они друг друга.
+This branch of my fork is used to publish my own test releases of Yapfast.
+It combines changes from my PRs so I can test them together and check whether
+they break each other.
 
-Релизы собираются для Windows и Linux. Для Linux выпускаются AppImage и пакет
-для Arch Linux. Сборки можно запускать через GitHub Actions; они предназначены
-для тестирования, а не для стабильного использования.
+Releases are built for Windows and Linux, including an AppImage and an Arch Linux
+package. Builds can be started through GitHub Actions and are intended for testing.
 
-Список влитых веток ведётся в [CHANGELOG.md](CHANGELOG.md).
-Подробнее об обновлении веток и выпуске сборок — в [инструкции](docs/fork-testing.md).
+Merged branches are recorded in [CHANGELOG.md](CHANGELOG.md).
+See the [instructions](docs/fork-testing.md) for details on updating branches
+and publishing builds.
 
-## Обновление из upstream/main
+## Update from upstream/main
 
 ```powershell
 git fetch upstream
