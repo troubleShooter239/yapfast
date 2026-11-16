@@ -1818,6 +1818,301 @@ fn call_volumes_play_while_dragged_and_are_remembered() {
 }
 
 #[test]
+fn stream_audio_changes_without_starting_or_switching_video() {
+    use i_slint_core::{accessibility::AccessibleStringProperty, item_tree::ItemRc};
+    use slint::platform::{PointerEventButton, WindowEvent};
+    use std::ops::ControlFlow;
+    i_slint_backend_testing::init_no_event_loop();
+    for live in [false, true] {
+        let window = classic_window();
+        window.set_voice_visible(live);
+        window.set_voice_active(live);
+        window.set_voice_ready(live);
+        window.set_sharing(live);
+        window.set_share_live(live);
+        window.show().unwrap();
+        window
+            .window()
+            .set_size(slint::LogicalSize::new(800., 900.));
+        window.set_share_audio_options(ModelRc::new(VecModel::from(vec![
+            SharedString::from("No audio"),
+            SharedString::from("All applications"),
+        ])));
+        let audio = Rc::new(Cell::new(None));
+        let heard = audio.clone();
+        window.on_stream_audio_changed(move |index| heard.set(Some(index)));
+        window.on_go_live(|_, _, _, _| panic!("changing audio must not start video"));
+        window.on_switch_live(|_| panic!("changing audio must not switch video"));
+        let weak = window.as_weak();
+        window.on_list_share_sources(move || weak.upgrade().unwrap().invoke_show_share_menu());
+        let click = |position: slint::LogicalPosition| {
+            let button = PointerEventButton::Left;
+            window
+                .window()
+                .dispatch_event(WindowEvent::PointerMoved { position });
+            window
+                .window()
+                .dispatch_event(WindowEvent::PointerPressed { position, button });
+            window
+                .window()
+                .dispatch_event(WindowEvent::PointerReleased { position, button });
+        };
+        window.set_share_lists(false);
+        if live {
+            let inner = i_slint_core::window::WindowInner::from_pub(window.window());
+            let button = ItemRc::new_root(inner.component())
+                .visit_descendants(|item| {
+                    if item
+                        .accessible_string_property(AccessibleStringProperty::Label)
+                        .as_deref()
+                        == Some("Switch screen or window")
+                    {
+                        ControlFlow::Break(item.clone())
+                    } else {
+                        ControlFlow::Continue(())
+                    }
+                })
+                .expect("the live stream's settings button");
+            button.accessible_action(&i_slint_core::accessibility::AccessibilityAction::Default);
+        } else {
+            window.invoke_show_share_menu();
+        }
+        i_slint_backend_testing::mock_elapsed_time(Duration::from_millis(50));
+        let popup_item = |name: &str| {
+            let inner = i_slint_core::window::WindowInner::from_pub(window.window());
+            let popups = inner.active_popups();
+            let popup = popups
+                .last()
+                .unwrap_or_else(|| panic!("audio menu opens before the portal (live={live})"));
+            let i_slint_core::window::PopupWindowLocation::ChildWindow(place) = popup.location
+            else {
+                panic!("not a child window");
+            };
+            let item = ItemRc::new_root(popup.component.clone())
+                .visit_descendants(|item| {
+                    if item
+                        .accessible_string_property(AccessibleStringProperty::Label)
+                        .as_deref()
+                        == Some(name)
+                    {
+                        ControlFlow::Break(item.clone())
+                    } else {
+                        ControlFlow::Continue(())
+                    }
+                })
+                .unwrap_or_else(|| panic!("menu offers {name}"));
+            let at = item.map_to_item_tree(item.geometry().center(), &popup.component);
+            slint::LogicalPosition::new(place.x + at.x, place.y + at.y)
+        };
+        let _ = popup_item("Screen or window");
+        click(popup_item("No audio"));
+        assert_eq!(audio.get(), Some(0), "audio applies immediately");
+        assert_eq!(window.get_share_audio_choice(), 0);
+        let inner = i_slint_core::window::WindowInner::from_pub(window.window());
+        assert!(
+            !inner.active_popups().is_empty(),
+            "audio leaves video choices open"
+        );
+        if live {
+            click(popup_item("Done"));
+            assert!(
+                inner.active_popups().is_empty(),
+                "Done closes without switching video"
+            );
+        }
+        window.hide().unwrap();
+    }
+}
+
+#[test]
+fn stream_window_pickers_share_one_scroll_area_in_a_fixed_height_menu() {
+    use i_slint_core::{
+        accessibility::{AccessibilityAction, AccessibleStringProperty},
+        item_tree::ItemRc,
+    };
+    use slint::platform::WindowEvent;
+    use std::ops::ControlFlow;
+    i_slint_backend_testing::init_no_event_loop();
+    let window = classic_window();
+    window.set_share_lists(true);
+    window.set_share_screens(ModelRc::new(VecModel::from(vec![ShareScreen {
+        title: "Entire screen".into(),
+        picture: Default::default(),
+    }])));
+    let titles = |prefix: &str| {
+        (0..32)
+            .map(|index| SharedString::from(format!("{prefix} {index}")))
+            .collect::<Vec<_>>()
+    };
+    let cards = titles("Video app")
+        .into_iter()
+        .map(|title| ShareScreen {
+            title,
+            picture: Default::default(),
+        })
+        .collect::<Vec<_>>();
+    window.set_share_windows(ModelRc::new(VecModel::from(cards)));
+    let mut audio = vec!["No audio".into(), "All applications".into()];
+    audio.extend(titles("Audio app"));
+    window.set_share_audio_options(ModelRc::new(VecModel::from(audio)));
+    let source = Rc::new(Cell::new(None));
+    let chosen = source.clone();
+    window.on_go_live(move |index, _, _, _| chosen.set(Some(index)));
+    let audio = Rc::new(Cell::new(None));
+    let chosen = audio.clone();
+    window.on_stream_audio_changed(move |index| chosen.set(Some(index)));
+    window.show().unwrap();
+    window
+        .window()
+        .set_size(slint::LogicalSize::new(800., 1100.));
+    window.invoke_show_share_menu();
+    i_slint_backend_testing::mock_elapsed_time(Duration::from_millis(50));
+    let find = |name: &str| {
+        let inner = i_slint_core::window::WindowInner::from_pub(window.window());
+        let popups = inner.active_popups();
+        let popup = popups.last().expect("share menu is open");
+        ItemRc::new_root(popup.component.clone()).visit_descendants(|item| {
+            if item
+                .accessible_string_property(AccessibleStringProperty::Label)
+                .as_deref()
+                == Some(name)
+            {
+                ControlFlow::Break(item.clone())
+            } else {
+                ControlFlow::Continue(())
+            }
+        })
+    };
+    assert!(find("Video windows").is_some() && find("Audio windows").is_none());
+    let popup_height = || {
+        let inner = i_slint_core::window::WindowInner::from_pub(window.window());
+        let popups = inner.active_popups();
+        ItemRc::new_root(popups.last().unwrap().component.clone())
+            .geometry()
+            .size
+            .height
+    };
+    assert_eq!(popup_height(), 560.);
+    assert!(
+        find("Other windows").is_none(),
+        "window thumbnails are shown immediately"
+    );
+    let card_position = |name| {
+        let card = find(name).unwrap();
+        card.map_to_window(card.geometry().origin)
+    };
+    let first = card_position("Video app 0");
+    let second = card_position("Video app 1");
+    let third = card_position("Video app 2");
+    assert_eq!(first.y, second.y, "two thumbnails share each row");
+    assert!(second.x > first.x);
+    assert_eq!(first.x, third.x);
+    assert!(third.y > first.y, "the third thumbnail begins the next row");
+    let video = find("Video windows").unwrap();
+    assert!(
+        video.geometry().size.height > popup_height(),
+        "the expanded list has its full content height"
+    );
+    assert!(
+        find("Audio windows").is_none(),
+        "video expansion leaves audio collapsed"
+    );
+    let before = find("Video app 0")
+        .unwrap()
+        .map_to_window(Default::default())
+        .y;
+    let audio_before = find("No audio")
+        .unwrap()
+        .map_to_window(Default::default())
+        .y;
+    let position = {
+        let inner = i_slint_core::window::WindowInner::from_pub(window.window());
+        let popups = inner.active_popups();
+        let popup = popups.last().unwrap();
+        let i_slint_core::window::PopupWindowLocation::ChildWindow(place) = popup.location else {
+            panic!("not a child window");
+        };
+        let target = find("Video app 0").unwrap();
+        let at = target.map_to_item_tree(target.geometry().center(), &popup.component);
+        slint::LogicalPosition::new(place.x + at.x, place.y + at.y)
+    };
+    window
+        .window()
+        .dispatch_event(WindowEvent::PointerScrolled {
+            position,
+            delta_x: 0.,
+            delta_y: -96.,
+        });
+    settle(&window);
+    assert!(
+        find("Video app 0")
+            .unwrap()
+            .map_to_window(Default::default())
+            .y
+            < before
+    );
+    assert!(
+        find("No audio")
+            .unwrap()
+            .map_to_window(Default::default())
+            .y
+            < audio_before,
+        "the same scroll moves the other sections too"
+    );
+    assert_eq!(popup_height(), 560., "scrolling does not resize the menu");
+    find("Video app 5")
+        .unwrap()
+        .accessible_action(&AccessibilityAction::Default);
+    assert!(find("Video windows").is_some());
+    find("Select audio from window")
+        .unwrap()
+        .accessible_action(&AccessibilityAction::Default);
+    assert!(find("Audio windows").unwrap().geometry().size.height > popup_height());
+    assert_eq!(
+        popup_height(),
+        560.,
+        "expanding audio does not resize the menu"
+    );
+    assert!(find("Video windows").is_some());
+    find("Audio app 0")
+        .unwrap()
+        .accessible_action(&AccessibilityAction::Default);
+    assert_eq!(
+        audio.get(),
+        Some(2),
+        "audio application indices are preserved"
+    );
+    find("Select audio from window")
+        .unwrap()
+        .accessible_action(&AccessibilityAction::Default);
+    assert!(find("Audio windows").is_none());
+    assert!(
+        find("No audio").is_some(),
+        "mute remains available with application choices collapsed"
+    );
+    find("Select audio from window")
+        .unwrap()
+        .accessible_action(&AccessibilityAction::Default);
+    find("Go Live")
+        .unwrap()
+        .accessible_action(&AccessibilityAction::Default);
+    assert_eq!(
+        source.get(),
+        Some(6),
+        "thumbnail selection preserves source indices"
+    );
+    window.invoke_show_share_menu();
+    settle(&window);
+    assert!(find("Video windows").is_some() && find("Audio windows").is_none());
+    assert_eq!(
+        window.get_share_audio_choice(),
+        2,
+        "reopening preserves the selected audio"
+    );
+    window.hide().unwrap();
+}
+
+#[test]
 fn the_share_menu_fits_a_short_window_and_keeps_its_button() {
     use slint::platform::{PointerEventButton, WindowEvent};
     i_slint_backend_testing::init_no_event_loop();
@@ -1838,7 +2133,14 @@ fn the_share_menu_fits_a_short_window_and_keeps_its_button() {
         title: "Entire screen".into(),
         ..Default::default()
     }])));
-    window.set_share_windows(titles("Window", 12));
+    let cards = (0..12)
+        .map(|index| ShareScreen {
+            title: format!("Window {index}").into(),
+            picture: Default::default(),
+        })
+        .collect::<Vec<_>>();
+    window.set_share_windows(ModelRc::new(VecModel::from(cards)));
+    window.set_share_audio_options(titles("Audio", 14));
     window.set_share_cameras(titles("Camera", 4));
     let went = Rc::new(Cell::new(None));
     let seen = went.clone();

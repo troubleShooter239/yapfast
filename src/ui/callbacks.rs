@@ -3061,13 +3061,30 @@ pub(super) fn bind_callbacks(window: &YapfastWindow, adapter: &Rc<RefCell<Adapte
     #[cfg(feature = "discord")]
     let weak = window.as_weak();
     #[cfg(feature = "discord")]
+    window.on_share_menu_closed(|| {
+        SHARE_PREVIEW_STOP.with_borrow(|stop| {
+            if let Some(stop) = stop {
+                stop.store(true, std::sync::atomic::Ordering::Relaxed);
+            }
+        });
+    });
+    #[cfg(feature = "discord")]
+    let share_state = adapter.clone();
+    #[cfg(feature = "discord")]
     window.on_list_share_sources(move || {
+        let audio = share_state.borrow().app.state.voice.stream_audio;
+        let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        SHARE_PREVIEW_REQUEST.with_borrow_mut(|previous| {
+            if let Some(previous) = previous.replace(stop.clone()) {
+                previous.store(true, std::sync::atomic::Ordering::Relaxed);
+            }
+        });
         use yapfast_core::stream_worker::{Report, Source, Worker};
         // A picture fills a card in the share menu, in pixels.
         let scale = weak
             .upgrade()
             .map_or(1.0, |window| window.window().scale_factor());
-        let (width, height) = ((160.0 * scale).ceil() as u32, (90.0 * scale).ceil() as u32);
+        let (width, height) = ((240.0 * scale).ceil() as u32, (135.0 * scale).ceil() as u32);
         // Listing starts a capturer for screens and one for windows, and
         // looks at each camera, so it runs beside the window, and the menu
         // opens when it's done.
@@ -3090,7 +3107,18 @@ pub(super) fn bind_callbacks(window: &YapfastWindow, adapter: &Rc<RefCell<Adapte
                     _ => None,
                 })
                 .collect();
+            let window_ids: Vec<u64> = windows
+                .iter()
+                .filter_map(|listed| match listed.source {
+                    Source::Window(id) => Some(id),
+                    _ => None,
+                })
+                .collect();
+            let opening = stop.clone();
             let opened = weak.upgrade_in_event_loop(move |window| {
+                if opening.load(std::sync::atomic::Ordering::Relaxed) {
+                    return;
+                }
                 let rows: Vec<ShareScreen> = screens
                     .iter()
                     .map(|listed| ShareScreen {
@@ -3106,7 +3134,39 @@ pub(super) fn bind_callbacks(window: &YapfastWindow, adapter: &Rc<RefCell<Adapte
                     ModelRc::new(VecModel::from(titles))
                 };
                 window.set_share_screens(Rc::new(VecModel::from(rows)).into());
-                window.set_share_windows(titles(&windows));
+                let window_rows: Vec<ShareScreen> = windows
+                    .iter()
+                    .map(|listed| ShareScreen {
+                        title: listed.title.as_str().into(),
+                        picture: Default::default(),
+                    })
+                    .collect();
+                window.set_share_windows(Rc::new(VecModel::from(window_rows)).into());
+                use yapfast_core::voice::StreamAudio;
+                let mut audio_sources = vec![StreamAudio::Off, StreamAudio::All];
+                let mut audio_titles = vec![
+                    SharedString::from("No audio"),
+                    SharedString::from("All applications"),
+                ];
+                #[cfg(windows)]
+                for listed in &windows {
+                    if let Source::Window(id) = listed.source {
+                        audio_sources.push(StreamAudio::Window(id));
+                        audio_titles.push(listed.title.as_str().into());
+                    }
+                }
+                let selected = audio_sources
+                    .iter()
+                    .position(|choice| *choice == audio)
+                    .unwrap_or_else(|| {
+                        // A closed window stays selected and silent, never broadening capture.
+                        audio_sources.push(audio);
+                        audio_titles.push("Unavailable application".into());
+                        audio_sources.len() - 1
+                    });
+                AUDIO_SHAREABLE.with_borrow_mut(|sources| *sources = audio_sources);
+                window.set_share_audio_options(Rc::new(VecModel::from(audio_titles)).into());
+                window.set_share_audio_choice(selected as i32);
                 window.set_share_cameras(titles(&cameras));
                 // Where the system's dialog picks a screen or window, the
                 // menu's first choice asks it, before the cameras.
@@ -3120,26 +3180,46 @@ pub(super) fn bind_callbacks(window: &YapfastWindow, adapter: &Rc<RefCell<Adapte
                         .chain(cameras.into_iter().map(|listed| listed.source))
                         .collect();
                 });
+                SHARE_PREVIEW_STOP.with_borrow_mut(|previous| {
+                    if let Some(previous) = previous.replace(opening.clone()) {
+                        previous.store(true, std::sync::atomic::Ordering::Relaxed);
+                    }
+                });
                 window.invoke_show_share_menu();
             });
-            if opened.is_err() || ids.is_empty() {
+            if opened.is_err()
+                || (ids.is_empty() && window_ids.is_empty())
+                || stop.load(std::sync::atomic::Ordering::Relaxed)
+            {
                 return;
             }
             // The pictures come from a worker, so capturing the screens takes
             // memory only until they're in.
-            let (_worker, mut reports) = match Worker::glance(ids, width, height) {
+            let (_worker, mut reports) = match Worker::glance(ids, window_ids, width, height) {
                 Ok(started) => started,
                 Err(error) => {
                     tracing::warn!("no pictures of the screens to share: {error:#}");
                     return;
                 }
             };
-            while let Some(report) = reports.blocking_recv() {
+            loop {
+                if stop.load(std::sync::atomic::Ordering::Relaxed) {
+                    break;
+                }
+                let report = match reports.try_recv() {
+                    Ok(report) => report,
+                    Err(_) if reports.is_closed() => break,
+                    Err(_) => {
+                        std::thread::sleep(std::time::Duration::from_millis(25));
+                        continue;
+                    }
+                };
                 match report {
                     Report::Screen {
                         id,
                         source_width,
                         source_height,
+                        window: is_window,
                         width,
                         height,
                         rgba,
@@ -3148,20 +3228,38 @@ pub(super) fn bind_callbacks(window: &YapfastWindow, adapter: &Rc<RefCell<Adapte
                             slint::SharedPixelBuffer::<slint::Rgba8Pixel>::clone_from_slice(
                                 &rgba, width, height,
                             );
+                        let pending = stop.clone();
                         let _ = weak.upgrade_in_event_loop(move |window| {
+                            if pending.load(std::sync::atomic::Ordering::Relaxed) {
+                                return;
+                            }
                             let at = SHAREABLE.with_borrow(|shareable| {
-                                shareable
-                                    .iter()
-                                    .position(|source| *source == Source::Display(id))
+                                shareable.iter().position(|source| {
+                                    *source
+                                        == if is_window {
+                                            Source::Window(id)
+                                        } else {
+                                            Source::Display(id)
+                                        }
+                                })
                             });
-                            let screens = window.get_share_screens();
+                            let (rows, at) = if is_window {
+                                (
+                                    window.get_share_windows(),
+                                    at.and_then(|at| {
+                                        at.checked_sub(window.get_share_screens().row_count())
+                                    }),
+                                )
+                            } else {
+                                (window.get_share_screens(), at)
+                            };
                             if let Some(at) = at
-                                && let Some(mut row) = screens.row_data(at)
+                                && let Some(mut row) = rows.row_data(at)
                             {
                                 row.picture = slint::Image::from_rgba8(pixels);
                                 row.source_width = source_width as i32;
                                 row.source_height = source_height as i32;
-                                screens.set_row_data(at, row);
+                                rows.set_row_data(at, row);
                             }
                         });
                     }
@@ -3184,6 +3282,21 @@ pub(super) fn bind_callbacks(window: &YapfastWindow, adapter: &Rc<RefCell<Adapte
     window.on_list_share_sources(move || {
         if let Some(window) = weak.upgrade() {
             window.invoke_show_share_menu();
+        }
+    });
+    #[cfg(feature = "discord")]
+    let state = adapter.clone();
+    #[cfg(feature = "discord")]
+    let weak = window.as_weak();
+    #[cfg(feature = "discord")]
+    window.on_stream_audio_changed(move |index| {
+        if let Some(window) = weak.upgrade()
+            && let Some(audio) =
+                AUDIO_SHAREABLE.with_borrow(|sources| sources.get(index as usize).copied())
+        {
+            state
+                .borrow_mut()
+                .action(&window, Action::Voice(voice::Command::StreamAudio(audio)));
         }
     });
     let state = adapter.clone();
@@ -3835,6 +3948,9 @@ fn restart_gate_meter(
 thread_local! {
     /// What the share menu lists to share, in its order.
     static SHAREABLE: RefCell<Vec<yapfast_core::stream_worker::Source>> = const { RefCell::new(Vec::new()) };
+    static SHARE_PREVIEW_STOP: RefCell<Option<Arc<std::sync::atomic::AtomicBool>>> = const { RefCell::new(None) };
+    static SHARE_PREVIEW_REQUEST: RefCell<Option<Arc<std::sync::atomic::AtomicBool>>> = const { RefCell::new(None) };
+    static AUDIO_SHAREABLE: RefCell<Vec<voice::StreamAudio>> = const { RefCell::new(Vec::new()) };
 }
 
 /// What the field of the message being edited, in its row, asks of the
