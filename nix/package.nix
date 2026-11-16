@@ -10,7 +10,7 @@ let
   toolchain = pkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
   rustPlatform = pkgs.makeRustPlatform { cargo = toolchain; rustc = toolchain; };
   id = "io.github.yapfast.Yapfast";
-  deepFilterHash = "sha256-JxvK5/PX29o23Pq9cNpTSyuAB7j9HszzDGHC2fOw74Y=";
+  deepFilterHash = "sha256-1xe1HSLnaUoPkFvi6R+/G4I74XP8YK1QJmTmIoBgkCc=";
   # deep_filter embeds a model from its repository's models/ folder, outside
   # the crate, which vendoring leaves out; this is the commit Cargo.lock pins.
   deepFilter =

@@ -39,3 +39,7 @@ prevent the formatter from introducing newer exception syntax.
 Selected Python 3.14.3 (`python314` from the existing nixpkgs pin) for Linux
 Skia preparation and both Nix development shells, without updating nixpkgs.
 Kept scripts compatible with Python 3.13 for use outside Nix.
+
+Updated the shared DeepFilterNet source hash to match revision `9b8790d` in
+`Cargo.lock`, using the actual hash reported by the Linux Nix build. This fixes
+the reported fixed-output hash mismatch during Cargo vendoring.
