@@ -9,6 +9,7 @@ Merged into `testing`:
 
 | Branch | Changes | Merge commit |
 | --- | --- | --- |
+| `chore/basic-ci` | CI, prek hooks, formatting and code style configuration | `a338c94d` |
 | `chore/deps-and-lint` | Dependency updates and lint fixes | `1e1aba91` |
 | `feat/check-microphone` | Microphone testing and level meter | `768c991a` |
 | `feat/go-live-preview-and-resolution` | Go Live preview and resolution selection | `602bb1ae` |
@@ -19,10 +20,14 @@ Merged into `testing`:
 
 `fix/windows-restart-hang` is already included in the base `main` branch,
 so it was not merged separately. The fork owner chose to exclude
-`chore/basic-ci`, `feat/window-transparency`, and `feat/voice-hotkeys`
+`feat/window-transparency` and `feat/voice-hotkeys`
 from the branch merges.
 
 Configured builds of the selected commit for Windows and Linux, with optional
 publication as a testing prerelease. Resolved merge conflicts and incompatibilities
 between the merged branches; compilation checks for all targets passed on Windows.
 Packaging in Actions and the combined changes at runtime have not yet been verified.
+
+Merged `chore/basic-ci` while retaining the testing README, updated dependencies,
+HEVC support and video orientation fixes. Enabled CI for pushes and PRs targeting
+`testing`. Fixed the contribution guide's link after the README replacement.

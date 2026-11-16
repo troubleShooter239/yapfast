@@ -3,6 +3,7 @@
 `testing` is the fork's persistent branch for building and testing PRs together.
 It starts at upstream `main` and merges these branches:
 
+- `chore/basic-ci`
 - `chore/deps-and-lint`
 - `feat/check-microphone`
 - `feat/go-live-preview-and-resolution`
@@ -12,7 +13,7 @@ It starts at upstream `main` and merges these branches:
 - `fix/high-cpu-usage-in-server`
 
 `fix/windows-restart-hang` is already included through `main`.
-Do not merge `chore/basic-ci`, `feat/window-transparency`, or
+Do not merge `feat/window-transparency` or
 `feat/voice-hotkeys` into this branch. Features already merged upstream remain.
 
 ## Update the combined branch
@@ -25,6 +26,7 @@ git fetch upstream
 git fetch origin --prune
 git switch testing
 git merge upstream/main
+git merge origin/chore/basic-ci
 git merge origin/chore/deps-and-lint
 git merge origin/feat/check-microphone
 git merge origin/feat/go-live-preview-and-resolution
