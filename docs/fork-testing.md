@@ -35,6 +35,8 @@ git merge origin/fix/high-cpu-usage-in-server
 git push origin testing
 ```
 
+Record each newly merged branch in [CHANGELOG.md](../CHANGELOG.md), including the date and merge commit.
+
 Run each merge separately. If it conflicts, resolve it and commit before
 continuing, or use `git merge --abort` to cancel that merge.
 Skip branch names that have been deleted after their PR was merged.
