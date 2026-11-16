@@ -86,7 +86,7 @@
         default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             rustup pkg-config cmake ninja llvmPackages_21.clang llvmPackages_21.libclang
-            protobuf curl jq docker-compose python3 llvmPackages_21.llvm
+            protobuf curl jq docker-compose python314 llvmPackages_21.llvm
             # pasta, nftables and iproute2 isolate one voice test participant's network.
             passt nftables iproute2
             # Runs testing/fake_discord.ts, and its tests side by side.
@@ -113,7 +113,7 @@
         };
         windows = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
-            rustup cargoXwin cmake ninja gn protobuf python3 curl jq zip wineWowPackages.stable
+            rustup cargoXwin cmake ninja gn protobuf python314 curl jq zip wineWowPackages.stable
             # Inno Setup's own installer opens windows even when silent.
             xvfb-run
             llvmPackages_21.clang llvmPackages_21.lld llvmPackages_21.llvm

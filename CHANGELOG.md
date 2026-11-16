@@ -35,3 +35,7 @@ HEVC support and video orientation fixes. Enabled CI for pushes and PRs targetin
 Fixed Skia preparation scripts failing under Nix's Python interpreter: restored
 parentheses around exception tuples and set Ruff's Python target to 3.13 to
 prevent the formatter from introducing newer exception syntax.
+
+Selected Python 3.14.3 (`python314` from the existing nixpkgs pin) for Linux
+Skia preparation and both Nix development shells, without updating nixpkgs.
+Kept scripts compatible with Python 3.13 for use outside Nix.

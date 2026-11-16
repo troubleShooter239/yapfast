@@ -1,4 +1,4 @@
-# Keep scripts compatible with the Python interpreter supplied by Nix.
+# Keep scripts compatible with Python 3.13 outside the Nix shells as well.
 target-version = "py313"
 line-length = 100
 extend-exclude = [".venv", "venv", "vendor", ".local", "target", "node_modules"]
