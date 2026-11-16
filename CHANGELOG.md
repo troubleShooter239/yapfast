@@ -76,3 +76,32 @@ pixel conversion matched the old implementation for 4,097 inputs.
 A Nix smoke build verified cc-rs compiler-variable precedence selects Clang
 23.1.0 for both C and C++, and successfully checked the compiler's Clang 23
 preprocessor macros. Full Linux application/release builds remain unverified.
+
+Updated the nightly workflow's cache action from v4 to v5 (Node.js 24 runtime)
+to remove the Node.js 20 deprecation warning.
+
+Updated Windows Skia preparation to read the pinned Clang version from the Nix
+shell instead of requiring 21.1.7. Its GN configuration and resource-header
+layout now use that compiler's major version, matching LLVM 23. Verified version
+validation and generated paths with a mocked build; the full Skia build is pending.
+
+Audited the first-party Python tools for Python 3.15. Enabled Ruff bug checks,
+upgrade checks and explicit subprocess exit handling, including extensionless
+scripts in directory scans. Preserved manually handled command failures.
+
+Made Skia cache readers tolerate corrupt or non-object metadata, closed HTTP
+responses and log files explicitly, bounded the emoji-data fetch, and reaped
+measurement subprocesses after forced shutdown. Source snapshots now include
+both root Nix flake files and the changelog, and timestamp handling works on
+Windows without following unsupported symlinks. Preserved explicit CRLF when
+writing the Visual Studio environment batch file.
+
+Added six build-tool regression tests (including the updated font-notice fixture)
+and run them in CI on Python 3.15. Ruff, syntax checks, documentation links and
+the unit tests passed locally. Live Linux GUI/audio/network workloads and full
+release builds were not run as part of this Python audit.
+
+Replaced string concatenation with f-strings throughout first-party Python
+scripts, including extensionless commands. Kept byte buffers, list concatenation
+and arithmetic unchanged. Verified JSON payloads and Windows package text output
+remain unchanged; Python lint, formatting and regression tests passed.

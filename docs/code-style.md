@@ -58,10 +58,18 @@ reuse prepared environments, and avoid running separate programs for overlapping
 
 - Ruff lint and formatter; Python 3.15 target.
 - Four spaces; line width 100; double quotes.
+- Use f-strings for text interpolation instead of string concatenation with `+`.
 - Format code examples in docstrings.
-- Enabled lint families: `E`, `W`, `F`, `I`, including import sorting.
+- Enabled lint families: `E`, `W`, `F`, `I`, `B`, `UP`, plus `PLW1510`:
+  import sorting, common bug checks, Python upgrades and explicit subprocess exit handling.
 - Automatic fixes run before formatting. Resolve remaining diagnostics manually.
 - Python shebang scripts are checked even without a `.py` extension.
+- Plain Ruff directory checks include the extensionless scripts listed in `ruff.toml`.
+- Close files and HTTP responses with context managers. Keep network/tool probes bounded;
+  long builds and interactive processes may intentionally wait until completion.
+- Treat invalid cache metadata as a cache miss; keep required input validation strict.
+- CI runs the build-tool unit tests on Python 3.15:
+  `python -m unittest testing.test_python_tools testing.test_font_notices -v`.
 
 ## Data, documentation and web files
 

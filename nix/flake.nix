@@ -127,6 +127,7 @@
           LK_CUSTOM_WEBRTC = "${windowsWebrtc}";
           YAPFAST_SKIA_WINDOWS_SOURCE = "${windowsSkiaSource}";
           YAPFAST_SKIA_CLANG = "${pkgs.llvmPackages_23.clang-unwrapped}/bin/clang-cl";
+          YAPFAST_SKIA_CLANG_VERSION = pkgs.lib.getVersion pkgs.llvmPackages_23.clang-unwrapped;
           YAPFAST_SKIA_LLD = "${pkgs.llvmPackages_23.lld}/bin/lld-link";
           YAPFAST_SKIA_CLANG_HEADERS = "${pkgs.llvmPackages_23.clang}/resource-root/include";
           LIBCLANG_PATH = "${pkgs.llvmPackages_23.libclang.lib}/lib";
