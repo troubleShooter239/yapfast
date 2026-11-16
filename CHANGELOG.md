@@ -43,3 +43,7 @@ Kept scripts compatible with Python 3.13 for use outside Nix.
 Updated the shared DeepFilterNet source hash to match revision `9b8790d` in
 `Cargo.lock`, using the actual hash reported by the Linux Nix build. This fixes
 the reported fixed-output hash mismatch during Cargo vendoring.
+
+Fixed Linux CI selecting Clang 23 while installing Clang 18. Added the signed
+LLVM APT repository, installed Clang/libclang/LLVM 23, and added a toolchain
+check before Cargo runs.
