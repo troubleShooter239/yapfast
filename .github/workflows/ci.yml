@@ -35,28 +35,29 @@ jobs:
       - run: cargo fmt --all -- --check
       - run: python3 scripts/check-doc-links
 
-  # TODO: Re-enable after dependency audit and unused-dependency fixes.
-  #   dependencies:
-  #     name: Dependencies (${{ matrix.tool }})
-  #     runs-on: ubuntu-latest
-  #     timeout-minutes: 15
-  #     strategy:
-  #       fail-fast: false
-  #       matrix:
-  #         tool: [cargo-audit, cargo-machete]
-  #     steps:
-  #       - uses: actions/checkout@v7.0.1
-  #         with:
-  #           persist-credentials: false
-  #       - uses: taiki-e/install-action@v2
-  #         with:
-  #           tool: ${{ matrix.tool }}
-  #       - name: Audit dependencies (deny all warnings)
-  #         if: matrix.tool == 'cargo-audit'
-  #         run: cargo audit --deny warnings
-  #       - name: Find unused dependencies
-  #         if: matrix.tool == 'cargo-machete'
-  #         run: cargo machete
+  dependencies:
+    name: Dependencies (${{ matrix.tool }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [cargo-audit, cargo-machete]
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: ${{ matrix.tool }}
+      - name: Audit dependencies (deny all warnings)
+        if: matrix.tool == 'cargo-audit'
+        # TODO: after fix audit errors reenable that line:
+        # run: cargo audit --deny warning
+        run: cargo audit
+      - name: Find unused dependencies
+        if: matrix.tool == 'cargo-machete'
+        run: cargo machete
 
   linux:
     name: Check, Clippy and tests
@@ -64,9 +65,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      CC: clang-18
-      CXX: clang++-18
-      LIBCLANG_PATH: /usr/lib/llvm-18/lib
+      CC: clang-23
+      CXX: clang++-23
+      LIBCLANG_PATH: /usr/lib/llvm-23/lib
     steps:
       - name: Free disk space
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
