@@ -22,7 +22,7 @@ env:
 jobs:
   formatting:
     name: Lint, formatting and documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7.0.1
@@ -42,7 +42,7 @@ jobs:
 
   dependencies:
     name: Dependencies (${{ matrix.tool }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -67,7 +67,7 @@ jobs:
   linux:
     name: Check, Clippy and tests
     needs: formatting
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 120
     env:
       CC: clang-23
