@@ -332,10 +332,13 @@ files named here are in `crates/yapfast-core/native/`.
 
 File demuxing and audio use libwebrtc's FFmpeg; HEVC pictures use the
 separate decoder. Only plain values cross between the two FFmpeg builds,
-whose structs and symbols must stay separate. Check a symbol in the archive:
+whose structs and symbols must stay separate. LiveKit's Linux archive prefixes
+its FFmpeg symbols with `LK_`; the core build script applies matching aliases
+to `decode.c` and `video.c`. Windows keeps the unprefixed names. Check a Linux
+symbol in the archive:
 
 ```sh
-nm $LK_CUSTOM_WEBRTC/lib/libwebrtc.a | grep ' T avformat_open_input'
+nm $LK_CUSTOM_WEBRTC/lib/libwebrtc.a | grep ' T LK_avformat_open_input'
 ```
 
 On NixOS, a binary run outside `nix develop` opens NVENC only with

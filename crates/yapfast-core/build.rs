@@ -100,6 +100,48 @@ fn main() {
         _ => "x64",
     };
     let mut codecs = cc::Build::new();
+    // LiveKit prefixes Chromium FFmpeg's Linux symbols with LK_ (since
+    // webrtc-sys 0.3.50). Rename declarations and calls in these shims to
+    // match, without touching the separately prefixed vendor/ffmpeg-src.
+    if target_os == "linux" {
+        for symbol in [
+            "av_find_best_stream",
+            "av_frame_alloc",
+            "av_frame_free",
+            "av_frame_unref",
+            "av_free",
+            "av_freep",
+            "av_get_packed_sample_fmt",
+            "av_log_set_level",
+            "av_malloc",
+            "av_packet_alloc",
+            "av_packet_free",
+            "av_packet_get_side_data",
+            "av_packet_move_ref",
+            "av_packet_unref",
+            "av_pix_fmt_desc_get",
+            "av_read_frame",
+            "av_rescale_q",
+            "av_sample_fmt_is_planar",
+            "avcodec_alloc_context3",
+            "avcodec_find_decoder",
+            "avcodec_flush_buffers",
+            "avcodec_free_context",
+            "avcodec_open2",
+            "avcodec_parameters_to_context",
+            "avcodec_receive_frame",
+            "avcodec_send_packet",
+            "avformat_alloc_context",
+            "avformat_close_input",
+            "avformat_find_stream_info",
+            "avformat_open_input",
+            "avformat_seek_file",
+            "avio_alloc_context",
+            "avio_context_free",
+        ] {
+            codecs.define(symbol, Some(format!("LK_{symbol}").as_str()));
+        }
+    }
     if std::env::var("DEP_FFMPEG_ENCODERS").as_deref() == Ok("1") {
         codecs.define("YAPFAST_FILE_HEVC", None);
     }

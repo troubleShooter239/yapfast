@@ -105,3 +105,15 @@ Replaced string concatenation with f-strings throughout first-party Python
 scripts, including extensionless commands. Kept byte buffers, list concatenation
 and arithmetic unchanged. Verified JSON payloads and Windows package text output
 remain unchanged; Python lint, formatting and regression tests passed.
+
+## 2026-11-17
+
+Fixed Linux linking against LiveKit's prefixed FFmpeg symbols. The core build
+script maps the Chromium FFmpeg calls in its native codec shims to `LK_*` on
+Linux, matching the pinned `webrtc-a545de4` archive. Windows and the separate
+`yf_*` FFmpeg build for HEVC/hardware codecs retain their existing linkage.
+
+Verified the pinned Linux archive hash and a native Linux link/decode smoke
+build using H264, AAC, MP4 and Opus/WebM fixtures. Windows all-target compilation
+checks, Rust formatting and documentation link checks passed. The complete
+application/AppImage release build has not yet been rerun.

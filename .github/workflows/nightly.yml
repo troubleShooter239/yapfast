@@ -48,7 +48,7 @@ jobs:
           ref: ${{ needs.version.outputs.commit }}
           # Nix refuses a shallow Git repository as a flake.
           fetch-depth: 0
-      - uses: cachix/install-nix-action@v31
+      - uses: cachix/install-nix-action@v31.11.5
         with:
           github_access_token: ${{ github.token }}
       - run: scripts/set-version "${{ needs.version.outputs.version }}"
@@ -59,7 +59,7 @@ jobs:
       - run: scripts/build-appimage
       # The AppImage's binary as an Arch package, in an Arch container.
       - run: scripts/package-arch
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: linux
           path: |
@@ -77,7 +77,7 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ needs.version.outputs.commit }}
-      - uses: cachix/install-nix-action@v31
+      - uses: cachix/install-nix-action@v31.11.5
         with:
           github_access_token: ${{ github.token }}
       # Skia built for Windows, and the MSVC CRT and SDK it was built against,
@@ -98,7 +98,7 @@ jobs:
       # Wine doesn't start on the runner (kernel32.dll, c0000135), so Inno
       # Setup can't make the installer there.
       - run: nix develop path:./nix#windows --command scripts/build-windows discord --no-installer
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: windows
           path: target/dist/discord/Yapfast-*
