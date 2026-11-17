@@ -1457,7 +1457,8 @@ export component ShareMenu inherits Rectangle {
         start := HorizontalLayout {
             padding: 4px; padding-top: 10px;
             ActionButton {
-                text: root.switching ? "Switch" : "Go Live"; icon: @image-url("icons/screen-share.svg"); primary: true; horizontal-stretch: 1;
+                text: root.switching ? (root.pick-source < 0 ? "Done" : "Switch") : "Go Live";
+                icon: @image-url("icons/screen-share.svg"); primary: true; horizontal-stretch: 1;
                 clicked => { root.go-live(root.pick-source, root.selected-resolution, root.pick-fps, root.pick-high-quality); }
             }
         }
