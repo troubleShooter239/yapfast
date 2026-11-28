@@ -1,5 +1,5 @@
 //! The GIFs tab: a search over Klipy after a quarter second's pause in
-//! typing; a home of the Favorites tile, crate::i18n::tr!(self.cx.i18n, "Trending GIFs") and the trending
+//! typing; a home of the Favorites tile, "Trending GIFs" and the trending
 //! terms; the GIFs found, in Discord's masonry of columns about 200 px wide.
 //! A click sends a GIF, Shift and a click puts it in the composer, and its
 //! star keeps it among the favourites. Back, or Escape, goes home; Escape

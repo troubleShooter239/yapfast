@@ -1,6 +1,6 @@
 //! Manage Accounts: the dialog that lists the Discord accounts linked on
 //! this device, each but the one in use with Switch, each with a menu to
-//! log it out, and crate::i18n::tr!(cx.i18n, "Add an account"), which links another beside them with
+//! log it out, and "Add an account", which links another beside them with
 //! the sign-in screen's steps (`signin::link_panel`), worded as Discord's
 //! client words them. The core keeps whether it's open and
 //! whose menu is open (`AppState::manage_accounts`); this keeps the Add
@@ -193,7 +193,7 @@ pub fn view<'a>(accounts: &'a Accounts, cx: Ctx<'a>) -> Option<Element<'a, Messa
     )
 }
 
-/// One account: its picture and username, crate::i18n::tr!(cx.i18n, "Active account") under the one
+/// One account: its picture and username, "Active account" under the one
 /// in use, Switch on the others, and the button for its menu, which opens
 /// under it.
 fn card<'a>(cx: Ctx<'a>, account: &'a DiscordAccount, menu: bool) -> Element<'a, Message> {

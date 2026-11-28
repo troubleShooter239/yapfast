@@ -1,9 +1,9 @@
 //! Discord polls on messages, shown after Discord's client: the question
 //! and its answers to pick, and once this account voted, the poll closed or
-//! crate::i18n::tr!(ctx.i18n, "Show results") was clicked, each answer's share of the votes, and a
+//! "Show results" was clicked, each answer's share of the votes, and a
 //! click on an answer, or on the votes so far, shows who voted. What this
 //! device alone knows of a poll (the answers picked before voting, whether
-//! crate::i18n::tr!(ctx.i18n, "Show results") was clicked) is kept among `revealed`, as
+//! "Show results" was clicked) is kept among `revealed`, as
 //! `{item}/pick{id}` and `{item}/results`.
 
 use iced::{

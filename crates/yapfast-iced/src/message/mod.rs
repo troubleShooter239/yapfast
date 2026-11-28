@@ -114,6 +114,16 @@ pub fn blocked_key(item: &str) -> String {
     format!("{item}/blocked")
 }
 
+/// Whether a key `revealed` holds is a spoiler uncovered: one in a message's
+/// text (`item/index`, as `yapfast_core::spoiler::link` names it) or over
+/// its attachment ([`reveal_key`]).
+pub fn is_spoiler_key(key: &str) -> bool {
+    key.rsplit_once('/').is_some_and(|(_, index)| {
+        let index = index.strip_prefix('a').unwrap_or(index);
+        !index.is_empty() && index.bytes().all(|byte| byte.is_ascii_digit())
+    })
+}
+
 /// What `revealed` holds for a long message shown whole.
 pub fn fold_key(item: &str) -> String {
     format!("{item}/more")
@@ -1693,7 +1703,7 @@ fn thread_ago(at_ms: u64, now_ms: u64) -> String {
     }
 }
 
-/// How a message of one's own is going, under it: crate::i18n::tr!(ctx.i18n, "Sending...") with Cancel
+/// How a message of one's own is going, under it: "Sending..." with Cancel
 /// while its files go, "Not sent yet" while the connection is down, or "Not
 /// sent" with Retry.
 fn delivery_line<'a>(

@@ -69,7 +69,7 @@ pub struct Voice {
     pub tries: u32,
     /// The soundboard's volume while its slider is dragged.
     pub soundboard: Option<u32>,
-    /// Entrance sounds: the server chosen (crate::i18n::tr!(self.cx.i18n, "All servers") first), and the
+    /// Entrance sounds: the server chosen ("All servers" first), and the
     /// sounds to choose from while that list is open.
     pub entrance_server: usize,
 }

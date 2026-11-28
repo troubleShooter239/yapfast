@@ -358,7 +358,7 @@ pub(super) fn profile_body<'a>(
 }
 
 /// The bar above a private profile's banner, in the profile's colour
-/// mostly dark: a lock and crate::i18n::tr!(ctx.i18n, "Private Profile"), in white.
+/// mostly dark: a lock and "Private Profile", in white.
 fn private_bar<'a>(ctx: crate::ctx::Ctx<'a>, inks: &Inks) -> Element<'a, Message> {
     let ground = crate::theme::mix(inks.primary, Color::from_rgb8(0x1a, 0x1a, 0x1e), 0.15);
     container(
@@ -1211,7 +1211,7 @@ fn mutual_line<'a>(
     container(line).height(20).align_y(Alignment::Center).into()
 }
 
-/// The bio: three lines and crate::i18n::tr!(ctx.i18n, "View full bio") on the card, whole
+/// The bio: three lines and "View full bio" on the card, whole
 /// elsewhere.
 pub(super) fn bio_view<'a>(
     ctx: crate::ctx::Ctx<'a>,

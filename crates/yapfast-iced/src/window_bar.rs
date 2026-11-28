@@ -490,6 +490,17 @@ pub fn update(app: &mut App, event: Event) -> Task<Message> {
     }
 }
 
+/// Appearance's "Show Discord's bar under it": under the desktop's title
+/// bar, Discord's bar shows or goes, and the content takes its room. Its
+/// Inbox closes with it.
+pub fn show_under_frame(app: &mut App, on: bool) {
+    app.shell.bar_under_frame = on;
+    if !on && !app.shell.own_title_bar {
+        app.inbox = None;
+    }
+    fit_window(app);
+}
+
 /// Appearance's switch: the window is made again with the desktop's
 /// frame or without it, where it was.
 pub fn choose_title_bar(app: &mut App, system: bool) -> Task<Message> {
@@ -845,7 +856,7 @@ pub fn window_bar(app: &App) -> Option<Element<'_, Message>> {
     } else {
         theme.secondary
     };
-    // The Friends page names the bar crate::i18n::tr!(app.i18n, "Friends"), as Discord's does.
+    // The Friends page names the bar "Friends", as Discord's does.
     let friends = workspace
         && app.sidebar.header.server.is_none()
         && crate::friends::dm_screen(app) == Some(DmScreen::Friends);
@@ -1182,25 +1193,20 @@ pub fn inbox_shown(app: &App) -> bool {
 /// waiting, a click going there; Mentions its pings' own messages under a
 /// filter, a click jumping to the message, and the rooms with mentions but
 /// no message kept below.
-pub fn inbox_view(app: &App) -> Option<Element<'_, Message>> {
+pub fn inbox_view<'a>(app: &'a App) -> Option<Element<'a, Message>> {
     let inbox = app.inbox.as_ref()?;
     if !inbox_shown(app) {
         return None;
     }
     let theme = &app.theme;
-    let tab = |label: &str, which: Tab, width: f32| -> Element<'_, Message> {
+    let tab = |label: &'a str, which: Tab, width: f32| -> Element<'a, Message> {
         let selected = inbox.tab == which;
         button(
-            container(
-                text(label.to_owned())
-                    .size(14)
-                    .font(BOLD)
-                    .color(if selected {
-                        theme.text
-                    } else {
-                        theme.secondary
-                    }),
-            )
+            container(text(label).size(14).font(BOLD).color(if selected {
+                theme.text
+            } else {
+                theme.secondary
+            }))
             .center(Length::Fill),
         )
         .padding(0)

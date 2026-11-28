@@ -439,7 +439,9 @@ Yapfast is back, rather than showing an error.
   a reply
   or a notification reads "(spoiler)". Attachments named `SPOILER_...` or
   flagged as spoilers, and pictures linked inside a spoiler, show blurred with
-  a "Spoiler" label until clicked. Revealing lasts while Yapfast runs. The eye
+  a "Spoiler" label until clicked. A spoiler uncovered stays so while its
+  channel is open, and covers again once another opens, as Discord's
+  client's do: it keeps the reveal only in the message on screen. The eye
   on a file waiting in the composer marks it as a spoiler, which blurs its
   thumbnail; Yapfast uploads it as `SPOILER_` and its name, as Discord's client
   does. Matrix has no spoiler for a file, so its rooms don't offer the eye.
@@ -1101,8 +1103,11 @@ the width is the same for all three tabs and comes back at the next start
   scrolls out of sight.
 - A click sends `POST /channels/{id}/messages` with `sticker_ids`, a message of
   the sticker alone as Discord's client sends it; the gateway's MESSAGE_CREATE
-  shows it, as it shows a poll. A sticker that couldn't be sent says why in
-  the channel.
+  shows it, as it shows a poll. While the composer replies, it goes as the
+  reply, with the same `message_reference` and, with the mention off,
+  `allowed_mentions` a text reply has, and the reply bar goes once Discord
+  took it, as Discord's client sends it through its composer's send. A
+  sticker that couldn't be sent says why in the channel.
 - Discord's default packs are anyone's to send, and the open server's own
   stickers too; another server's, and every server's in a DM, need Nitro and
   show greyed with a lock until then, as Discord's client has them
@@ -1143,6 +1148,13 @@ page that reaches them shows them again without asking Discord, and the
 window goes. Leaving the channel lets the window go too, and only the
 newest go to disk. Pages loading for a window that a newer jump or the
 present replaced are dropped when they come.
+
+Scrolling up by hand makes a window too, as Discord's client does once it
+holds more than 120 messages: past the 200 a channel keeps, an earlier page
+leaves the oldest 200 showing as a window, and those after them wait beside
+it as above, so the pill shows. Scrolling down loads them back a page at a
+time; Jump to present, or leaving the channel, shows the newest 200 of the
+window and those beside it together, without asking Discord.
 
 The window holds what was asked for, not every page between it and the
 present. Growing upwards past 200 messages, it lets go of its newest,

@@ -7,7 +7,7 @@
 //! mentions, in, has, dates, author type, pinned, then the words) and
 //! searches, or with nothing left closes the results; Clear Filters empties
 //! the fields. A filter that would take the search past 512 characters
-//! isn't added: crate::i18n::tr!(ctx.i18n, "Unable to add filter").
+//! isn't added: "Unable to add filter".
 
 use chrono::{Datelike, NaiveDate, TimeZone};
 use iced::{
@@ -112,7 +112,7 @@ pub enum FiltersEvent {
     RemoveDate(usize),
     Clear,
     Apply,
-    /// crate::i18n::tr!(ctx.i18n, "Back to editing"), after a filter too long for the search.
+    /// "Back to editing", after a filter too long for the search.
     Back,
 }
 

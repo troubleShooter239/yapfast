@@ -301,7 +301,7 @@ impl<'a> crate::ctx::Ctx<'a> {
         boxed.style(move |_| rounded(raised, radius)).into()
     }
 
-    /// A spoiler's cover over a picture: the picture dimmed, crate::i18n::tr!(self.i18n, "SPOILER") on a
+    /// A spoiler's cover over a picture: the picture dimmed, "SPOILER" on a
     /// pill.
     pub fn spoiler_cover(self, radius: f32) -> Element<'a, Message> {
         container(

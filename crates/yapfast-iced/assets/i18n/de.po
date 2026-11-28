@@ -154,9 +154,6 @@ msgstr "Ist die Option aus, wird nur angezeigt, wer wo geschrieben hat."
 msgid "Flash the taskbar"
 msgstr "In der Taskleiste blinken"
 
-msgid "For a message that notifies while Yapfast isn't in front. The window's title counts mentions and DMs waiting either way."
-msgstr "Bei einer Nachricht, die eine Benachrichtigung auslöst, während Yapfast im Hintergrund ist. Der Fenstertitel zählt Erwähnungen und Direktnachrichten in beiden Fällen."
-
 msgid "For new messages while Yapfast isn't in front. Each Discord server's notification settings and your Matrix notification rules decide which: usually DMs and mentions. Clicking one opens the conversation."
 msgstr "Für neue Nachrichten, während Yapfast im Hintergrund ist. Die Benachrichtigungseinstellungen der Discord-Server und deine Matrix-Regeln bestimmen, welche Nachrichten eine Benachrichtigung auslösen. Meist sind es Direktnachrichten und Erwähnungen. Ein Klick öffnet die Unterhaltung."
 
@@ -4794,3 +4791,12 @@ msgstr "Sprachkanalstatus erstellt"
 
 msgid "Delete Voice Channel Status"
 msgstr "Sprachkanalstatus gelöscht"
+
+msgid "Show Discord's bar under it"
+msgstr "Discord-Leiste unter der Titelleiste anzeigen"
+
+msgid "Back and Forward, where you are, the Inbox and Help, as Discord's app always shows them. Off, the desktop's title bar alone."
+msgstr "Zeigt Zurück, Vorwärts, den aktuellen Bereich, Posteingang und Hilfe. Ist dies aus, bleibt nur die Systemtitelleiste."
+
+msgid "With a notification, until you come back to Yapfast. The window's title counts mentions and DMs waiting either way."
+msgstr "Bei einer Benachrichtigung blinkt die Taskleiste bis zur Rückkehr zu Yapfast. Der Fenstertitel zeigt ausstehende Erwähnungen und Direktnachrichten in beiden Fällen an."

@@ -154,9 +154,6 @@ msgstr "Если выключено, видно только, кто и куда
 msgid "Flash the taskbar"
 msgstr "Мигать значком на панели задач"
 
-msgid "For a message that notifies while Yapfast isn't in front. The window's title counts mentions and DMs waiting either way."
-msgstr "При уведомлении о сообщении, когда Yapfast не на переднем плане. Заголовок окна в любом случае показывает число упоминаний и личных сообщений."
-
 msgid "For new messages while Yapfast isn't in front. Each Discord server's notification settings and your Matrix notification rules decide which: usually DMs and mentions. Clicking one opens the conversation."
 msgstr "Для новых сообщений, когда Yapfast не на переднем плане. Настройки каждого сервера Discord и правила уведомлений Matrix определяют, о каких сообщениях уведомлять. Обычно это личные сообщения и упоминания. Нажатие на уведомление открывает беседу."
 
@@ -4794,3 +4791,12 @@ msgstr "Создание статуса голосового канала"
 
 msgid "Delete Voice Channel Status"
 msgstr "Удаление статуса голосового канала"
+
+msgid "Show Discord's bar under it"
+msgstr "Показывать панель Discord под заголовком окна"
+
+msgid "Back and Forward, where you are, the Inbox and Help, as Discord's app always shows them. Off, the desktop's title bar alone."
+msgstr "Показывает кнопки «Назад» и «Вперёд», текущий раздел, входящие и справку. При отключении остаётся системный заголовок окна."
+
+msgid "With a notification, until you come back to Yapfast. The window's title counts mentions and DMs waiting either way."
+msgstr "При уведомлении кнопка на панели задач мигает, пока вы не вернётесь в Yapfast. Заголовок окна в любом случае показывает число упоминаний и непрочитанных личных сообщений."
